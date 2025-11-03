@@ -3,6 +3,11 @@ from flask import Flask, session, redirect, request, render_template_string, url
 app = Flask(__name__)
 app.secret_key = "4416"
 
+@app.route('/google522b3008e358c667.html')
+def google_verify():
+    return "google-site-verification: google522b3008e358c667.html"
+
+
 # --- Yuvarlak ürünler ---
 products = [
     {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": "3.00 TL"},
@@ -51,6 +56,8 @@ def index():
     <html>
     <head>
         <meta charset="utf-8">
+         <meta name="google-site-verification" content="z32f-tdI6mzvK-nC_96Q8POA6Hwmia2kqVMh-L9dEq4" />
+
         <title>Erkam Mıknatıs</title>
         <style>
             body {{
