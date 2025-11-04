@@ -59,6 +59,8 @@ def index():
          <meta name="google-site-verification" content="z32f-tdI6mzvK-nC_96Q8POA6Hwmia2kqVMh-L9dEq4" />
 
         <title>Erkam Mıknatıs</title>
+    <meta name="description" content="Erkam Mıknatıs: Yuvarlak, dikdörtgen, halka ve özel mıknatıs çeşitleri. Uygun fiyat, hızlı kargo, güvenilir hizmet.">
+</head>
         <style>
             body {{
                 margin:0;
