@@ -60,7 +60,8 @@ def index():
 
         <title>Erkam Mıknatıs</title>
     <meta name="description" content="Erkam Mıknatıs: Yuvarlak, dikdörtgen, halka ve özel mıknatıs çeşitleri. Uygun fiyat, hızlı kargo, güvenilir hizmet.">
-</head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
         <style>
             body {{
                 margin:0;
