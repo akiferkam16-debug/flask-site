@@ -61,6 +61,8 @@ def index():
         <title>Erkam Mıknatıs</title>
     <meta name="description" content="Erkam Mıknatıs: Yuvarlak, dikdörtgen, halka ve özel mıknatıs çeşitleri. Uygun fiyat, hızlı kargo, güvenilir hizmet.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Erkam Mıknatıs">
+<meta name="robots" content="index, follow">
 
         <style>
             body {{
@@ -182,7 +184,10 @@ def index():
             }}
         </style>
     </head>
-    <body>
+    <body><p style="display:none;">
+Erkam Mıknatıs, yuvarlak ve dikdörtgen mıknatıs satışında uzmanlaşmış bir firmadır.
+</p>
+
         <header>
             <a class="cart-link" href="/cart">🛒 Sepeti Görüntüle</a>
             <div class="logo">
