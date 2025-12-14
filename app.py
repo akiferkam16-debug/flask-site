@@ -1,9 +1,10 @@
 from flask import Flask, session, redirect, request, render_template_string, url_for
 
 app = Flask(__name__)
+# Güvenlik için secret_key gereklidir.
 app.secret_key = "4416"
 
-# Google doğrulama
+# Google doğrulama endpoint'i
 @app.route('/google522b3008e358c667.html')
 def google_verify():
     return "google-site-verification: google522b3008e358c667.html"
@@ -26,26 +27,27 @@ rectangle_products = [
     {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": "14.00 TL"},
 ]
 
+def create_product_html(prod_list):
+    """Ürün listesinden HTML kartlarını oluşturur."""
+    html = ""
+    for p in prod_list:
+        html += f"""
+        <div class="product-card">
+            <img src="/static/{p['file']}" alt="{p['name']}">
+            <div class="title">{p['name']}</div>
+            <div class="price">{p['price']}</div>
+            <a class="add-btn" href="{url_for('add_to_cart', product_id=p['id'])}">Sepete Ekle</a>
+        </div>
+        """
+    return html
+
+# --- Ana Sayfa Route'u ---
 @app.route("/")
 def index():
-    # Ürün kartlarını HTML olarak oluşturma
-    def create_product_html(prod_list):
-        html = ""
-        for p in prod_list:
-            html += f"""
-            <div class="product-card">
-                <img src="/static/{p['file']}" alt="{p['name']}">
-                <div class="title">{p['name']}</div>
-                <div class="price">{p['price']}</div>
-                <a class="add-btn" href="{url_for('add_to_cart', product_id=p['id'])}">Sepete Ekle</a>
-            </div>
-            """
-        return html
-    
     product_html = create_product_html(products)
     rectangle_html = create_product_html(rectangle_products)
 
-    # Mantıksal olarak ayrılmış ürün bloklarını birleştirme (content div'i içine girecek kısım)
+    # Ürün bloklarını content div'i içine girecek şekilde birleştirme
     all_products_content = f"""
     <a id="yuvarlak"></a>
     <div class="products-section">
@@ -125,7 +127,7 @@ def index():
             /* Ana Düzen (page-layout) - Masaüstü görünümü */
             main {{
                 flex:1;
-                padding:20px 0; /* Sol ve sağ padding kaldırıldı, layout içinden verilecek */
+                padding:20px 0; 
             }}
             .page-layout {{
                 display: flex; 
@@ -133,7 +135,7 @@ def index():
                 align-items: flex-start; 
                 max-width: 1200px;
                 margin: 0 auto;
-                padding: 0 20px; /* İç kenar boşluğu */
+                padding: 0 20px; 
             }}
             .category-sidebar {{
                 width: 250px; 
@@ -273,7 +275,7 @@ def index():
                 .category-sidebar {{
                     width: 100%; 
                     position: static; 
-                    padding: 10px 0; /* Yatayda padding kaldırıldı, linkler yan yana dizilecek */
+                    padding: 10px 0; 
                     text-align: center; 
                 }}
                 /* "Kategoriler" başlığını gizle */
@@ -288,9 +290,12 @@ def index():
                     border: 1px solid #0b1a3d;
                     border-radius: 4px;
                     background: #f8f8f8;
+                    color: #0b1a3d;
                 }}
                 .category-sidebar a:hover {{
                     padding-left: 15px; 
+                    background: #0b1a3d;
+                    color: #ffd700;
                 }}
                 
                 /* 4. Ürün Izgarası (Grid) Düzenlemesi */
@@ -307,7 +312,6 @@ def index():
                 }}
             }}
             /* --- MOBİL UYUMLULUK SONU --- */
-            /* ------------------------------------------------------------------- */
         </style>
     </head>
     <body>
@@ -345,8 +349,7 @@ def index():
     """, all_products_content=all_products_content)
 
 
-# --- Sepete ekleme, Sepeti görüntüle, Sepetten sil fonksiyonları aynı kalmıştır ---
-
+# --- Sepete ekleme ---
 @app.route("/add_to_cart/<int:product_id>")
 def add_to_cart(product_id):
     cart = session.get("cart", [])
@@ -356,8 +359,11 @@ def add_to_cart(product_id):
             cart.append(product)
             break
     session["cart"] = cart
-    return redirect("/cart")
+    # Ürün eklendikten sonra sepete yönlendir
+    return redirect(url_for('cart_page'))
 
+
+# --- Sepeti Görüntüle (TAMAMEN DÜZELTİLMİŞ) ---
 @app.route("/cart")
 def cart_page():
     cart = session.get("cart", [])
@@ -372,9 +378,10 @@ def cart_page():
             
         total += price
         cart_html += f"""
-        <li style='font-size:18px; margin:10px 0; display:flex; justify-content: space-between; align-items: center;'>
-            <span>{item['name']} - {item['price']}</span>
-            <a href='{url_for('remove_from_cart', index=idx)}' style='color:#ffd700; text-decoration:none; font-weight:bold;'>❌ Sil</a>
+        <li class="cart-item">
+            <span class="item-name">{item['name']}</span>
+            <span class="item-price">{item['price']}</span>
+            <a href='{url_for('remove_from_cart', index=idx)}' class="remove-btn">❌ Sil</a>
         </li>
         """
     return f"""
@@ -382,36 +389,143 @@ def cart_page():
     <head>
         <meta charset="utf-8">
         <title>Sepetiniz</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body {{ background:#0b1a3d; color:#fff; font-family:Arial; text-align:center; padding:30px; min-height:100vh; display:flex; flex-direction:column; }}
-            h1 {{ color:#ffd700; }}
-            ul {{ list-style:none; padding:0; max-width:600px; margin:20px auto; text-align:left; background:#1e2a4a; padding:20px; border-radius:10px; }}
-            .total {{ font-size:24px; font-weight:bold; margin-top:20px; color:#ffd700; }}
-            a {{ color:#ffd700; text-decoration:underline; font-size:18px; transition:0.2s; }}
-            a:hover {{ color:#ffea00; }}
-            .checkout-btn {{ margin-top:20px; padding:10px 20px; font-size:20px; background:green; color:#fff; border:none; border-radius:8px; cursor:pointer; transition:0.3s; display:inline-block; }}
-            .checkout-btn:hover {{ background:darkgreen; transform:scale(1.05); }}
+            body {{ 
+                background:#0b1a3d; 
+                color:#fff; 
+                font-family:Arial, sans-serif; 
+                text-align:center; 
+                padding:20px; 
+                min-height:100vh; 
+                display:flex; 
+                flex-direction:column; 
+            }}
+            .cart-container {{
+                background:#1e2a4a; 
+                padding:25px; 
+                border-radius:10px;
+                max-width:600px;
+                width: 95%;
+                margin: 20px auto;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            }}
+            h1 {{ color:#ffd700; margin-top:0; }}
+            ul {{ list-style:none; padding:0; margin:0; }}
+            
+            .cart-item {{ 
+                font-size:17px; 
+                margin:12px 0; 
+                padding: 10px 0;
+                display:flex; 
+                justify-content: space-between; 
+                align-items: center; 
+                border-bottom: 1px dashed #334466;
+            }}
+            .item-name {{
+                flex-grow: 1;
+                text-align: left;
+            }}
+            .item-price {{
+                font-weight: bold;
+                color: #ffd700;
+                margin-right: 15px;
+            }}
+
+            .remove-btn {{ 
+                color:red; 
+                text-decoration:none; 
+                font-weight:bold; 
+                transition: color 0.2s;
+            }}
+            .remove-btn:hover {{
+                color: darkred;
+            }}
+
+            .total {{ 
+                font-size:24px; 
+                font-weight:bold; 
+                margin-top:20px; 
+                padding-top: 15px;
+                border-top: 2px solid #334466;
+                color:#ffd700; 
+            }}
+            
+            .actions a {{ 
+                color:#ffd700; 
+                text-decoration:none; 
+                font-size:18px; 
+                transition:0.2s; 
+                display: block; 
+                margin-top: 15px;
+            }}
+            .actions a:hover {{ color:#ffea00; }}
+            
+            .checkout-btn {{ 
+                margin-top:20px; 
+                padding:12px 25px; 
+                font-size:20px; 
+                background:green; 
+                color:#fff; 
+                border:none; 
+                border-radius:8px; 
+                cursor:pointer; 
+                transition:0.3s; 
+                display:inline-block; 
+                width: 100%; 
+                max-width: 300px; 
+            }}
+            .checkout-btn:hover {{ 
+                background:darkgreen; 
+                transform:scale(1.03); 
+            }}
+            
+            /* Mobil İyileştirmeler */
+            @media (max-width: 480px) {{
+                .cart-item {{
+                    flex-direction: column; 
+                    align-items: flex-start;
+                    padding: 10px;
+                }}
+                .item-name {{
+                    font-size: 1em;
+                    margin-bottom: 5px;
+                }}
+                .item-price {{
+                    margin-bottom: 8px;
+                    margin-right: 0;
+                }}
+                .remove-btn {{
+                    align-self: flex-end; 
+                    font-size: 14px;
+                }}
+            }}
         </style>
     </head>
     <body>
-        <h1>🛒 Sepetiniz</h1>
-        <ul>{cart_html if cart_html else '<li>Sepetinizde ürün bulunmamaktadır.</li>'}</ul>
-        <p class="total">Toplam: {total:.2f} TL</p>
-        <div>
-            <p><a href="/">⬅️ Alışverişe Geri Dön</a></p>
-            <a class="checkout-btn" href="#">💳 Sepeti Onayla</a>
+        <div class="cart-container">
+            <h1>🛒 Sepetiniz</h1>
+            <ul>{cart_html if cart_html else '<li>Sepetinizde ürün bulunmamaktadır.</li>'}</ul>
+            <p class="total">Toplam: {total:.2f} TL</p>
+            <div class="actions">
+                <a href="/">⬅️ Alışverişe Geri Dön</a>
+                <a class="checkout-btn" href="#">💳 Sepeti Onayla</a>
+            </div>
         </div>
     </body>
     </html>
     """
 
+# --- Sepetten sil ---
 @app.route("/remove_from_cart/<int:index>")
 def remove_from_cart(index):
     cart = session.get("cart", [])
     if 0 <= index < len(cart):
         cart.pop(index)
         session["cart"] = cart
-    return redirect("/cart")
+    # Ürün silindikten sonra sepet sayfasına geri dön
+    return redirect(url_for('cart_page'))
 
 if __name__=="__main__":
+    # Uygulamayı hata ayıklama modu açık olarak çalıştırır
     app.run(debug=True)
