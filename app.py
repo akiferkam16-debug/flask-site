@@ -59,6 +59,9 @@ def index():
          <meta name="google-site-verification" content="z32f-tdI6mzvK-nC_96Q8POA6Hwmia2kqVMh-L9dEq4" />
 
         <title>Erkam Mıknatıs</title>
+    <link rel="icon" href="/static/favicon.png" sizes="192x192">
+<link rel="apple-touch-icon" href="/static/favicon.png">
+
     <meta name="description" content="Erkam Mıknatıs: Yuvarlak, dikdörtgen, halka ve özel mıknatıs çeşitleri. Uygun fiyat, hızlı kargo, güvenilir hizmet.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="author" content="Erkam Mıknatıs">
