@@ -1,17 +1,15 @@
 from flask import Flask, session, redirect, request, render_template_string, url_for
 
 app = Flask(__name__)
-# Gizli anahtar: Uygulama çalışırken oturum (session) verilerini şifrelemek için kullanılır.
 app.secret_key = "4416"
 
-# Google doğrulama (değişiklik yok)
+# Google doğrulama
 @app.route('/google522b3008e358c667.html')
 def google_verify():
     return "google-site-verification: google522b3008e358c667.html"
 
 
 # --- Ürün Verileri ---
-# Ürün verileri aynı bırakılmıştır
 products = [
     {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": "3.00 TL"},
     {"id": 2, "name": "8x3 mm Yuvarlak", "file": "2.jpg", "price": "6.00 TL"},
@@ -30,30 +28,24 @@ rectangle_products = [
 
 @app.route("/")
 def index():
-    # Ürün kartları HTML'ini oluşturma kısmı aynı kalmıştır.
-    product_html = ""
-    for p in products:
-        product_html += f"""
-        <div class="product-card">
-            <img src="/static/{p['file']}" alt="{p['name']}">
-            <div class="title">{p['name']}</div>
-            <div class="price">{p['price']}</div>
-            <a class="add-btn" href="{url_for('add_to_cart', product_id=p['id'])}">Sepete Ekle</a>
-        </div>
-        """
+    # Ürün kartlarını HTML olarak oluşturma
+    def create_product_html(prod_list):
+        html = ""
+        for p in prod_list:
+            html += f"""
+            <div class="product-card">
+                <img src="/static/{p['file']}" alt="{p['name']}">
+                <div class="title">{p['name']}</div>
+                <div class="price">{p['price']}</div>
+                <a class="add-btn" href="{url_for('add_to_cart', product_id=p['id'])}">Sepete Ekle</a>
+            </div>
+            """
+        return html
+    
+    product_html = create_product_html(products)
+    rectangle_html = create_product_html(rectangle_products)
 
-    rectangle_html = ""
-    for p in rectangle_products:
-        rectangle_html += f"""
-        <div class="product-card">
-            <img src="/static/{p['file']}" alt="{p['name']}">
-            <div class="title">{p['name']}</div>
-            <div class="price">{p['price']}</div>
-            <a class="add-btn" href="{url_for('add_to_cart', product_id=p['id'])}">Sepete Ekle</a>
-        </div>
-        """
-
-    # Mantıksal olarak ayrılmış ürün bloklarını birleştirme
+    # Mantıksal olarak ayrılmış ürün bloklarını birleştirme (content div'i içine girecek kısım)
     all_products_content = f"""
     <a id="yuvarlak"></a>
     <div class="products-section">
@@ -72,7 +64,6 @@ def index():
     </div>
     """
 
-    # --- HTML Şablonu (Tekrar Kullanılabilir ve Düzeltilmiş) ---
     return render_template_string(f"""
     <html>
     <head>
@@ -87,7 +78,7 @@ def index():
         <meta name="robots" content="index, follow">
 
         <style>
-            /* Genel Stil Düzeltmeleri */
+            /* --- Genel Stil --- */
             body {{
                 margin:0;
                 font-family: Arial, sans-serif;
@@ -104,21 +95,20 @@ def index():
                 justify-content:space-between;
                 align-items:center;
                 padding:10px 20px;
-                background:#f8f8f8; /* Header için arka plan eklendi */
+                background:#f8f8f8; 
                 border-bottom: 1px solid #eee;
             }}
             .logo {{
                 text-align:center;
                 flex:1;
             }}
-            .logo img {{ max-height:60px; }}
             .logo h1 {{
                 margin:5px 0 0 0;
                 font-size:28px;
-                color:#0b1a3d; /* Logo rengi */
+                color:#0b1a3d;
             }}
             .cart-link {{
-                color:#0b1a3d; /* Sepet linki rengi düzeltildi */
+                color:#0b1a3d;
                 text-decoration:none;
                 font-weight:bold;
                 transition: all 0.2s ease;
@@ -132,24 +122,25 @@ def index():
                 color: #ffd700;
             }}
             
-            /* Main & Layout Düzeltmesi */
+            /* Ana Düzen (page-layout) - Masaüstü görünümü */
             main {{
                 flex:1;
-                padding:20px;
+                padding:20px 0; /* Sol ve sağ padding kaldırıldı, layout içinden verilecek */
             }}
             .page-layout {{
-                display: flex; /* Ana hatayı çözen satır: Flexbox ile yan yana düzenleme */
+                display: flex; 
                 gap: 20px;
-                align-items: flex-start; /* İçeriğin yukarıdan başlaması */
+                align-items: flex-start; 
                 max-width: 1200px;
                 margin: 0 auto;
+                padding: 0 20px; /* İç kenar boşluğu */
             }}
             .category-sidebar {{
-                width: 250px; /* Sabit genişlik */
+                width: 250px; 
                 padding: 15px;
                 background: #f4f4f4;
                 border-radius: 8px;
-                position: sticky; /* Sayfa kayarken menünün görünür kalması */
+                position: sticky; 
                 top: 20px;
             }}
             .category-sidebar h3 {{
@@ -164,7 +155,7 @@ def index():
                 text-decoration: none;
                 color: #555;
                 font-weight: bold;
-                transition: color 0.2s;
+                transition: color 0.2s, background 0.2s, padding 0.2s;
             }}
             .category-sidebar a:hover {{
                 color: #ffd700;
@@ -174,16 +165,17 @@ def index():
             }}
             
             .content {{
-                flex: 1; /* Geri kalan tüm alanı kaplar */
-                min-width: 0; /* Flexbox düzeltmesi */
+                flex: 1; 
+                min-width: 0; 
             }}
             
-            /* Ürün Bölümleri (Stiller aynı bırakıldı) */
+            /* Ürün Kartları */
             .products-section {{
                 background:#0b1a3d;
                 padding:20px;
                 border-radius:12px;
                 margin-top:15px;
+                color: #fff;
             }}
             .products-section h2 {{
                 text-align:center;
@@ -192,16 +184,15 @@ def index():
             }}
             .products-grid {{
                 display:grid;
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Daha duyarlı ızgara */
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
                 gap:20px;
                 justify-items:center;
             }}
-            /* ... Diğer ürün kartı stilleri aynı kalmıştır ... */
             .product-card {{
                 background:#222;
                 border-radius:12px;
                 padding:12px;
-                width:200px; /* Genişlik artırıldı */
+                width:200px; 
                 text-align:center;
                 box-shadow:0 4px 12px rgba(0,0,0,0.5);
                 transition: transform 0.3s, box-shadow 0.3s;
@@ -213,8 +204,8 @@ def index():
             }}
             .product-card img {{
                 max-width:100%;
-                height:150px; /* Sabit yükseklik eklendi */
-                object-fit: cover; /* Resmi sığdırma */
+                height:150px; 
+                object-fit: cover; 
                 border-radius:6px;
                 margin-bottom:8px;
                 transition: transform 0.3s;
@@ -243,8 +234,80 @@ def index():
                 padding:14px 0;
                 font-size:14px;
                 color:#bbb;
-                margin-top: auto; /* Footer'ı sayfanın altına iter */
+                margin-top: auto;
             }}
+
+
+            /* ------------------------------------------------------------------- */
+            /* --- MOBİL UYUMLULUK (RESPONSIVE DESIGN) BAŞLANGIÇ --- */
+            @media (max-width: 768px) {{
+                /* 1. Header Düzenlemesi */
+                header {{
+                    flex-direction: column; 
+                    padding: 10px;
+                }}
+                .logo {{
+                    order: -1; 
+                    margin-bottom: 10px;
+                }}
+                .cart-link {{
+                    order: 1; 
+                    margin-top: 10px;
+                }}
+                .logo h1 {{
+                    font-size: 24px;
+                }}
+                /* Sağ taraftaki boş div'i gizle */
+                header div[style="width:100px;"] {{
+                    display: none;
+                }}
+
+                /* 2. Ana Sayfa Düzenlemesi (page-layout) */
+                .page-layout {{
+                    flex-direction: column; 
+                    gap: 15px;
+                    padding: 0 10px; 
+                }}
+
+                /* 3. Kategori Menüsü (Sidebar) Düzenlemesi */
+                .category-sidebar {{
+                    width: 100%; 
+                    position: static; 
+                    padding: 10px 0; /* Yatayda padding kaldırıldı, linkler yan yana dizilecek */
+                    text-align: center; 
+                }}
+                /* "Kategoriler" başlığını gizle */
+                .category-sidebar h3 {{
+                    display: none; 
+                }}
+                /* Kategori linklerini yan yana diz */
+                .category-sidebar a {{
+                    display: inline-block; 
+                    padding: 8px 15px;
+                    margin: 5px;
+                    border: 1px solid #0b1a3d;
+                    border-radius: 4px;
+                    background: #f8f8f8;
+                }}
+                .category-sidebar a:hover {{
+                    padding-left: 15px; 
+                }}
+                
+                /* 4. Ürün Izgarası (Grid) Düzenlemesi */
+                .products-grid {{
+                    grid-template-columns: 1fr; 
+                    gap: 15px;
+                }}
+                
+                /* Ürün kartının genişliğini tam ayarla */
+                .product-card {{
+                    width: 90%; 
+                    max-width: 350px; 
+                    margin: 0 auto; 
+                }}
+            }}
+            /* --- MOBİL UYUMLULUK SONU --- */
+            /* ------------------------------------------------------------------- */
         </style>
     </head>
     <body>
@@ -279,16 +342,17 @@ def index():
         </footer>
     </body>
     </html>
-    """, product_html=product_html, rectangle_html=rectangle_html) # Bu satır aslında artık gereksiz çünkü yukarıda hepsi birleştirildi
+    """, all_products_content=all_products_content)
+
 
 # --- Sepete ekleme, Sepeti görüntüle, Sepetten sil fonksiyonları aynı kalmıştır ---
 
 @app.route("/add_to_cart/<int:product_id>")
 def add_to_cart(product_id):
     cart = session.get("cart", [])
-    for product in products + rectangle_products:
+    all_products = products + rectangle_products
+    for product in all_products:
         if product["id"] == product_id:
-            # Ürünün sadece ID'sini ve ismini eklemek yerine, tam objeyi eklemek daha iyi
             cart.append(product)
             break
     session["cart"] = cart
@@ -301,11 +365,10 @@ def cart_page():
     total = 0.0
     for idx, item in enumerate(cart):
         try:
-            # TL formatından float'a dönüştürme daha sağlam yapıldı
             price_str = item["price"].replace(" TL", "").replace(",", ".")
             price = float(price_str)
         except ValueError:
-            price = 0.0 # Eğer fiyat hatalıysa 0 kabul et
+            price = 0.0
             
         total += price
         cart_html += f"""
@@ -351,5 +414,4 @@ def remove_from_cart(index):
     return redirect("/cart")
 
 if __name__=="__main__":
-    # Üretim ortamında 'debug=True' kullanılmamalıdır.
     app.run(debug=True)
