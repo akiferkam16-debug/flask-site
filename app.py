@@ -71,8 +71,8 @@ def index():
             body {{
                 margin:0;
                 font-family: Arial, sans-serif;
-                background:#111;
-                color:#fff;
+                background:#fff;
+                color:#000;
                 display:flex;
                 flex-direction:column;
                 min-height:100vh;
@@ -194,12 +194,25 @@ Erkam Mıknatıs, yuvarlak ve dikdörtgen mıknatıs satışında uzmanlaşmış
         <header>
             <a class="cart-link" href="/cart">🛒 Sepeti Görüntüle</a>
             <div class="logo">
-                <img src="/static/logo.jpg" alt="Logo">
+                
                 <h1>Erkam Mıknatıs</h1>
             </div>
             <div style="width:100px;"></div>
         </header>
-        <main>
+        <main><div class="page-layout">
+
+    <!-- Sağ kategori menüsü -->
+    <aside class="category-sidebar">
+        <h3>Kategoriler</h3>
+        <a href="#yuvarlak">Yuvarlak Ürünler</a>
+        <a href="#dikdortgen">Dikdörtgen Ürünler</a>
+    </aside>
+
+    <!-- İçerik -->
+    <div class="content">
+    </div> <!-- content -->
+</div> <!-- page-layout -->
+
             <!-- Yuvarlak Ürünler -->
             <div class="products-section">
                 <h2>Yuvarlak Ürünler</h2>
