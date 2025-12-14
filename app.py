@@ -2,14 +2,13 @@ from flask import Flask, session, redirect, request, render_template_string, url
 import os
 
 # -------------------------------------------------------------------
-# 1. FLASK UYGULAMASININ TANIMLANMASI (Gunicorn'un Aradığı Kısım)
-# Bu satırın, tüm fonksiyonlardan önce, dosyanın en üstünde olması gerekir.
+# 1. FLASK UYGULAMASININ TANIMLANMASI 
 app = Flask(__name__) 
 # SECRET_KEY, session kullanıldığı için kritik. Ortam değişkeninden okur.
 app.secret_key = os.environ.get("SECRET_KEY", "CokUzunVeGuvensizVarsayilanAnahtar12345") 
 # -------------------------------------------------------------------
 
-# --- Ürün Verileri (Bu kısım öncekilerle aynıdır) ---
+# --- Ürün Verileri ---
 products = [
     {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": "3.00 TL"},
     {"id": 2, "name": "8x3 mm Yuvarlak", "file": "2.jpg", "price": "6.00 TL"},
@@ -24,6 +23,12 @@ rectangle_products = [
     {"id": 102, "name": "20x10x5 mm Dikdörtgen", "file": "20x10x5.jpg", "price": "9.00 TL"},
     {"id": 103, "name": "30x10x5 mm Dikdörtgen", "file": "30x10x5 77tl.jpg", "price": "11.00 TL"},
     {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": "14.00 TL"},
+]
+
+# --- YENİ EKLENEN: Havşalı (Countersunk/Ring) Ürünler ---
+ring_products = [
+    {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": "23.00 TL"},
+ 
 ]
 
 # Google doğrulama endpoint'i
@@ -51,6 +56,8 @@ def index():
     
     product_html = create_product_html(products)
     rectangle_html = create_product_html(rectangle_products)
+    # YENİ EKLENEN: Havşalı ürünlerin HTML'i
+    ring_html = create_product_html(ring_products)
 
     # Ürün bloklarını content div'i içine girecek şekilde birleştirme
     all_products_content = f"""
@@ -67,6 +74,14 @@ def index():
         <h2>Dikdörtgen Ürünler</h2>
         <div class="products-grid">
             {rectangle_html}
+        </div>
+    </div>
+    
+    <a id="havsali"></a>
+    <div class="products-section">
+        <h2>Halka (Havşalı) Ürünler</h2>
+        <div class="products-grid">
+            {ring_html}
         </div>
     </div>
     """
@@ -281,7 +296,7 @@ def index():
                     position: static; 
                     padding: 10px; 
                     background: #f8f8f8; /* Beyaz/açık arka plan */
-                    border: 1px solid #ddd;<br>
+                    border: 1px solid #ddd;
                     border-radius: 8px;
                 }}
                 .category-sidebar h3 {{
@@ -358,7 +373,7 @@ def index():
     </head>
     <body>
         <p style="display:none;">
-            Erkam Mıknatıs, yuvarlak ve dikdörtgen mıknatıs satışında uzmanlaşmış bir firmadır.
+            Erkam Mıknatıs, yuvarlak, dikdörtgen ve halka (havşalı) mıknatıs satışında uzmanlaşmış bir firmadır.
         </p>
 
         <header>
@@ -375,7 +390,7 @@ def index():
                     <h3>Kategoriler</h3>
                     <a href="#yuvarlak">Yuvarlak Ürünler</a>
                     <a href="#dikdortgen">Dikdörtgen Ürünler</a>
-                </aside>
+                    <a href="#havsali">Halka (Havşalı) Ürünler</a> </aside>
 
                 <div class="content">
                     {all_products_content} 
@@ -395,7 +410,8 @@ def index():
 @app.route("/add_to_cart/<int:product_id>")
 def add_to_cart(product_id):
     cart = session.get("cart", [])
-    all_products = products + rectangle_products
+    # Tüm ürün listeleri birleştirildi
+    all_products = products + rectangle_products + ring_products 
     for product in all_products:
         if product["id"] == product_id:
             cart.append(product)
@@ -431,114 +447,32 @@ def cart_page():
         <title>Sepetiniz</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body {{ 
-                background:#0b1a3d; 
-                color:#fff; 
-                font-family:Arial, sans-serif; 
-                text-align:center; 
-                padding:20px; 
-                min-height:100vh; 
-                display:flex; 
-                flex-direction:column; 
-            }}
-            .cart-container {{
-                background:#1e2a4a; 
-                padding:25px; 
-                border-radius:10px;
-                max-width:600px;
-                width: 95%;
-                margin: 20px auto;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            }}
+            body {{ background:#0b1a3d; color:#fff; font-family:Arial, sans-serif; text-align:center; padding:20px; min-height:100vh; display:flex; flex-direction:column; }}
+            .cart-container {{ background:#1e2a4a; padding:25px; border-radius:10px; max-width:600px; width: 95%; margin: 20px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }}
             h1 {{ color:#ffd700; margin-top:0; }}
             ul {{ list-style:none; padding:0; margin:0; }}
             
-            .cart-item {{ 
-                font-size:17px; 
-                margin:12px 0; 
-                padding: 10px 0;
-                display:flex; 
-                justify-content: space-between; 
-                align-items: center; 
-                border-bottom: 1px dashed #334466;
-            }}
-            .item-name {{
-                flex-grow: 1;
-                text-align: left;
-            }}
-            .item-price {{
-                font-weight: bold;
-                color: #ffd700;
-                margin-right: 15px;
-            }}
+            .cart-item {{ font-size:17px; margin:12px 0; padding: 10px 0; display:flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #334466; }}
+            .item-name {{ flex-grow: 1; text-align: left; }}
+            .item-price {{ font-weight: bold; color: #ffd700; margin-right: 15px; }}
 
-            .remove-btn {{ 
-                color:red; 
-                text-decoration:none; 
-                font-weight:bold; 
-                transition: color 0.2s;
-            }}
-            .remove-btn:hover {{
-                color: darkred;
-            }}
+            .remove-btn {{ color:red; text-decoration:none; font-weight:bold; transition: color 0.2s; }}
+            .remove-btn:hover {{ color: darkred; }}
 
-            .total {{ 
-                font-size:24px; 
-                font-weight:bold; 
-                margin-top:20px; 
-                padding-top: 15px;
-                border-top: 2px solid #334466;
-                color:#ffd700; 
-            }}
+            .total {{ font-size:24px; font-weight:bold; margin-top:20px; padding-top: 15px; border-top: 2px solid #334466; color:#ffd700; }}
             
-            .actions a {{ 
-                color:#ffd700; 
-                text-decoration:none; 
-                font-size:18px; 
-                transition:0.2s; 
-                display: block; 
-                margin-top: 15px;
-            }}
+            .actions a {{ color:#ffd700; text-decoration:none; font-size:18px; transition:0.2s; display: block; margin-top: 15px; }}
             .actions a:hover {{ color:#ffea00; }}
             
-            .checkout-btn {{ 
-                margin-top:20px; 
-                padding:12px 25px; 
-                font-size:20px; 
-                background:green; 
-                color:#fff; 
-                border:none; 
-                border-radius:8px; 
-                cursor:pointer; 
-                transition:0.3s; 
-                display:inline-block; 
-                width: 100%; 
-                max-width: 300px; 
-            }}
-            .checkout-btn:hover {{ 
-                background:darkgreen; 
-                transform:scale(1.03); 
-            }}
+            .checkout-btn {{ margin-top:20px; padding:12px 25px; font-size:20px; background:green; color:#fff; border:none; border-radius:8px; cursor:pointer; transition:0.3s; display:inline-block; width: 100%; max-width: 300px; }}
+            .checkout-btn:hover {{ background:darkgreen; transform:scale(1.03); }}
             
             /* Mobil İyileştirmeler */
             @media (max-width: 480px) {{
-                .cart-item {{
-                    flex-direction: column; 
-                    align-items: flex-start;
-                    padding: 10px;
-                }}
-                .item-name {{
-                    font-size: 1em;
-                    margin-bottom: 5px;
-                }}
-                .item-price {{
-                    margin-bottom: 8px;
-                    margin-right: 0;
-                }}
-                .remove-btn {{
-                    align-self: flex-end; 
-                    font-size: 14px;
-                }}
+                .cart-item {{ flex-direction: column; align-items: flex-start; padding: 10px; }}
+                .item-name {{ font-size: 1em; margin-bottom: 5px; }}
+                .item-price {{ margin-bottom: 8px; margin-right: 0; }}
+                .remove-btn {{ align-self: flex-end; font-size: 14px; }}
             }}
         </style>
     </head>
