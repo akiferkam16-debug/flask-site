@@ -102,9 +102,9 @@ def index():
         </header>
         <div class="page-layout">
             <aside class="category-sidebar">
-                <a href="#yuvarlak">🔵 Yuvarlak</a>
-                <a href="#dikdortgen">⬛ Dikdörtgen</a>
-                <a href="#havsali">⭕ Halka</a>
+                <a href="#yuvarlak"> Yuvarlak</a>
+                <a href="#dikdortgen"> Dikdörtgen</a>
+                <a href="#havsali"> Halka</a>
             </aside>
             <main style="flex:1;">{all_content}</main>
         </div>
@@ -187,7 +187,7 @@ def cart_page():
             <h2 style="text-align:right; color:#0b1a3d;">Toplam: {total:.2f} TL</h2>
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <a href="/" class="back-link">⬅️ Alışverişe Geri Dön</a>
-                <a href="#" class="checkout-btn">Tamamla</a>
+                <a href="#" class="checkout-btn">siparişi onayla</a>
             </div>
         </div>
     </body>
