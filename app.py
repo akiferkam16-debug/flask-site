@@ -187,7 +187,7 @@ def cart_page():
             <h2 style="text-align:right; color:#0b1a3d;">Toplam: {total:.2f} TL</h2>
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <a href="/" class="back-link">⬅️ Alışverişe Geri Dön</a>
-                <a href="#" class="checkout-btn">siparişi onayla</a>
+                <a href="#" class="checkout-btn">✅ Siparişi Onayla</a>
             </div>
         </div>
     </body>
