@@ -28,7 +28,7 @@ rectangle_products = [
 # --- YENİ EKLENEN: Havşalı (Countersunk/Ring) Ürünler ---
 ring_products = [
     {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": "23.00 TL"},
- 
+  {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": "25.00 TL"},
 ]
 
 # Google doğrulama endpoint'i
