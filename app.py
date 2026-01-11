@@ -24,6 +24,35 @@ ring_products = [
     {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": "25.00 TL"},
 ]
 
+# --- Ortak Stil ve Header Fonksiyonu ---
+def get_header_html():
+    return """
+    <header>
+        <div style="display:flex; gap:10px;">
+            <a class="nav-btn contact-btn" href="/iletisim">📞 İletişim</a>
+            <a class="nav-btn cart-btn" href="/cart">🛒 Sepetim</a>
+        </div>
+        <div class="logo"><h1>Erkam Mıknatıs</h1></div>
+        <div style="width:100px;" class="desktop-spacer"></div>
+    </header>
+    """
+
+def get_common_styles():
+    return """
+    body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:#f4f4f4; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:15px 30px; background:#fff; border-bottom: 3px solid #0b1a3d; position: sticky; top:0; z-index:100; }
+    .logo h1 { color:#0b1a3d; margin:0; font-size: 24px; }
+    .nav-btn { text-decoration:none; font-weight:bold; padding:10px 20px; border-radius:30px; transition: 0.3s; color:#fff; font-size: 14px; }
+    .contact-btn { background:#27ae60; }
+    .contact-btn:hover { background:#2ecc71; }
+    .cart-btn { background:#0b1a3d; }
+    .cart-btn:hover { background:#ffd700; color:#0b1a3d; }
+    @media (max-width:600px) { 
+        header { padding: 10px; flex-direction: column; gap: 10px; }
+        .desktop-spacer { display:none; }
+    }
+    """
+
 # --- Sepet Güvenlik Kontrolü ---
 def get_cart():
     cart = session.get("cart", {})
@@ -63,25 +92,12 @@ def index():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Erkam Mıknatıs</title>
         <style>
-            body {{ margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:#f4f4f4; }}
-            header {{ display:flex; justify-content:space-between; align-items:center; padding:15px 30px; background:#fff; border-bottom: 3px solid #0b1a3d; position: sticky; top:0; z-index:100; }}
-            .logo h1 {{ color:#0b1a3d; margin:0; font-size: 24px; }}
-            .cart-link {{ color:#fff; background:#0b1a3d; text-decoration:none; font-weight:bold; padding:10px 20px; border-radius:30px; transition: 0.3s; }}
-            .cart-link:hover {{ background:#ffd700; color:#0b1a3d; }}
-            
+            {get_common_styles()}
             .page-layout {{ display: flex; gap: 20px; max-width: 1200px; margin: 20px auto; padding: 0 20px; }}
             .category-sidebar {{ width: 220px; background:#fff; padding:20px; border-radius:12px; height: fit-content; border: 1px solid #ddd; position: sticky; top: 90px; }}
             .category-sidebar a {{ display:block; padding:10px 0; text-decoration:none; color:#0b1a3d; font-weight:bold; border-bottom:1px solid #eee; }}
-            
             .products-section {{ background:#0b1a3d; padding:25px; border-radius:15px; margin-bottom:30px; color:#fff; }}
-            
-            /* ÜRÜN DİZİLİMİ - 3'LÜ VE YAN YANA */
-            .products-grid {{ 
-                display: grid; 
-                grid-template-columns: repeat(3, 1fr); /* BURASI 3'LÜ YAPAR */
-                gap: 20px; 
-            }}
-            
+            .products-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }}
             .product-card {{ background:#fff; padding:15px; border-radius:12px; text-align:center; color:#000; transition: 0.3s; }}
             .product-card:hover {{ transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }}
             .product-card img {{ width:100%; height:150px; object-fit:cover; border-radius:8px; }}
@@ -89,17 +105,12 @@ def index():
             .price {{ color: #e67e22; font-size: 1.1em; font-weight: bold; }}
             .add-btn {{ background:#0b1a3d; color:#fff; text-decoration:none; padding:10px; border-radius:6px; display:block; margin-top:10px; font-weight:bold; }}
             .add-btn:hover {{ background:#ffd700; color:#0b1a3d; }}
-
             @media (max-width:992px) {{ .products-grid {{ grid-template-columns: repeat(2, 1fr); }} }}
-            @media (max-width:768px) {{ .page-layout {{ flex-direction:column; }} .category-sidebar {{ width: 100%; position:static; }} .products-grid {{ grid-template-columns: repeat(2, 1fr); }} }}
+            @media (max-width:768px) {{ .page-layout {{ flex-direction:column; }} .category-sidebar {{ width: 100%; position:static; }} }}
         </style>
     </head>
     <body>
-        <header>
-            <a class="cart-link" href="/cart">🛒 Sepetim</a>
-            <div class="logo"><h1>Erkam Mıknatıs</h1></div>
-            <div style="width:100px;"></div>
-        </header>
+        {get_header_html()}
         <div class="page-layout">
             <aside class="category-sidebar">
                 <a href="#yuvarlak"> Yuvarlak</a>
@@ -107,6 +118,51 @@ def index():
                 <a href="#havsali"> Halka</a>
             </aside>
             <main style="flex:1;">{all_content}</main>
+        </div>
+    </body>
+    </html>
+    """)
+
+# --- İletişim Sayfası ---
+@app.route("/iletisim")
+def contact():
+    return render_template_string(f"""
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>İletişim - Erkam Mıknatıs</title>
+        <style>
+            {get_common_styles()}
+            .contact-container {{ max-width:600px; margin: 50px auto; background:#fff; padding:30px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1); text-align:center; }}
+            .contact-item {{ margin: 25px 0; padding: 15px; border-radius: 10px; background: #f9f9f9; border-left: 5px solid #0b1a3d; }}
+            .contact-item h3 {{ margin: 0 0 5px 0; color: #0b1a3d; }}
+            .contact-item p {{ margin: 0; font-size: 18px; color: #333; font-weight: bold; }}
+            .contact-item a {{ color: #27ae60; text-decoration: none; }}
+            .back-home {{ display: inline-block; margin-top: 20px; color: #0b1a3d; font-weight: bold; text-decoration: none; border-bottom: 2px solid #0b1a3d; }}
+        </style>
+    </head>
+    <body>
+        {get_header_html()}
+        <div class="contact-container">
+            <h1>Bizimle İletişime Geçin</h1>
+            
+            <div class="contact-item">
+                <h3>☎️ Sabit Telefon</h3>
+                <p><a href="tel:+902120000000">0212 635 70 22</a></p>
+            </div>
+
+            <div class="contact-item">
+                <h3>📱 Cep Telefonu / WhatsApp</h3>
+                <p><a href="https://wa.me/905XXXXXXX">0538 647 20 45</a></p>
+            </div>
+
+            <div class="contact-item">
+                <h3>📧 Gmail Adresimiz</h3>
+                <p><a href="mailto:erkammiknatis@gmail.com">erkammiknatis@gmail.com</a></p>
+            </div>
+
+            <a href="/" class="back-home">⬅️ Alışverişe Devam Et</a>
         </div>
     </body>
     </html>
@@ -152,9 +208,7 @@ def cart_page():
         total += sub
         items_html += f"""
         <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:15px 0; align-items:center;">
-            <div style="flex:2;">
-                <span style="font-weight:bold; color:#0b1a3d;">{v['name']}</span>
-            </div>
+            <div style="flex:2;"><span style="font-weight:bold; color:#0b1a3d;">{v['name']}</span></div>
             <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:10px;">
                 <a href="/remove_from_cart/{v['id']}" style="background:#f0f2f5; color:#000; padding:5px 10px; text-decoration:none; border-radius:4px; font-weight:bold;">-</a>
                 <strong>{v['quantity']}</strong>
@@ -169,24 +223,22 @@ def cart_page():
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body {{ background:#f0f2f5; font-family: sans-serif; padding:20px; }}
-            .cart-box {{ max-width:600px; margin:auto; background:#fff; padding:30px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1); }}
+            {get_common_styles()}
+            .cart-box {{ max-width:600px; margin:20px auto; background:#fff; padding:30px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1); }}
             h1 {{ border-bottom:2px solid #0b1a3d; padding-bottom:10px; color:#0b1a3d; }}
-            .back-link {{ 
-                display:inline-block; margin-top:20px; color:#0b1a3d; text-decoration:none; 
-                font-weight:bold; padding:10px 15px; border:2px solid #0b1a3d; border-radius:8px; transition: 0.3s;
-            }}
+            .back-link {{ display:inline-block; margin-top:20px; color:#0b1a3d; text-decoration:none; font-weight:bold; padding:10px 15px; border:2px solid #0b1a3d; border-radius:8px; transition: 0.3s; }}
             .back-link:hover {{ background:#0b1a3d; color:#fff; }}
             .checkout-btn {{ display:block; background:#28a745; color:#fff; text-align:center; padding:15px; border-radius:8px; text-decoration:none; margin-top:20px; font-weight:bold; }}
         </style>
     </head>
     <body>
+        {get_header_html()}
         <div class="cart-box">
             <h1>🛒 Sepetiniz</h1>
             {items_html if items_html else "<p>Sepetiniz boş.</p>"}
             <h2 style="text-align:right; color:#0b1a3d;">Toplam: {total:.2f} TL</h2>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <a href="/" class="back-link">⬅️ Alışverişe Geri Dön</a>
+                <a href="/" class="back-link">⬅️ Geri Dön</a>
                 <a href="#" class="checkout-btn">✅ Siparişi Onayla</a>
             </div>
         </div>
@@ -196,4 +248,3 @@ def cart_page():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    
