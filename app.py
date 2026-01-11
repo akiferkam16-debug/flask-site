@@ -30,7 +30,11 @@ all_products_list = products + rectangle_products + ring_products
 def get_header_html():
     return """
     <header>
-        <div class="nav-controls">
+        <div class="logo">
+            <a href="/" style="text-decoration:none;"><h1>Erkam Mıknatıs</h1></a>
+        </div>
+        
+        <div class="nav-right">
             <a class="nav-btn contact-btn" href="/iletisim">📞 İletişim</a>
             <a class="nav-btn cart-btn" href="/cart">🛒 Sepetim</a>
             <form action="/search" method="GET" class="search-form">
@@ -38,22 +42,52 @@ def get_header_html():
                 <button type="submit">🔍</button>
             </form>
         </div>
-        <div class="logo"><a href="/" style="text-decoration:none;"><h1>Erkam Mıknatıs</h1></a></div>
-        <div style="width:100px;" class="desktop-spacer"></div>
     </header>
     """
 
 def get_common_styles():
     return """
     body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:#f4f4f4; color: #333; }
-    header { display:flex; justify-content:space-between; align-items:center; padding:15px 30px; background:#fff; border-bottom: 3px solid #0b1a3d; position: sticky; top:0; z-index:1000; }
-    .nav-controls { display:flex; gap:10px; align-items:center; }
+    
+    header { 
+        display:flex; 
+        justify-content: space-between; 
+        align-items:center; 
+        padding:15px 5%; 
+        background:#fff; 
+        border-bottom: 3px solid #0b1a3d; 
+        position: sticky; 
+        top:0; 
+        z-index:1000; 
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .logo h1 { color:#0b1a3d; margin:0; font-size: 26px; font-weight: 800; }
+    
+    .nav-right { display:flex; gap:15px; align-items:center; }
+    
     .search-form { display:flex; margin-left:10px; }
-    .search-form input { padding:8px 12px; border:1px solid #ddd; border-radius:20px 0 0 20px; outline:none; width:150px; }
-    .search-form button { padding:8px 15px; border:none; background:#0b1a3d; color:white; border-radius:0 20px 20px 0; cursor:pointer; }
-    .logo h1 { color:#0b1a3d; margin:0; font-size: 24px; }
-    .nav-btn { text-decoration:none; font-weight:bold; padding:10px 20px; border-radius:30px; transition: 0.3s; color:#fff; font-size: 14px; }
+    .search-form input { 
+        padding:8px 15px; 
+        border:1px solid #ddd; 
+        border-radius:20px 0 0 20px; 
+        outline:none; 
+        width:180px; 
+        transition: 0.3s;
+    }
+    .search-form input:focus { border-color: #0b1a3d; width: 220px; }
+    .search-form button { 
+        padding:8px 15px; 
+        border:none; 
+        background:#0b1a3d; 
+        color:white; 
+        border-radius:0 20px 20px 0; 
+        cursor:pointer; 
+    }
+
+    .nav-btn { text-decoration:none; font-weight:bold; padding:10px 20px; border-radius:30px; transition: 0.3s; color:#fff; font-size: 14px; white-space: nowrap; }
     .contact-btn { background:#27ae60; }
+    .contact-btn:hover { background:#2ecc71; }
     .cart-btn { background:#0b1a3d; }
     .cart-btn:hover { background:#ffd700; color:#0b1a3d; }
     
@@ -66,11 +100,10 @@ def get_common_styles():
     .add-btn { background:#0b1a3d; color:#fff; text-decoration:none; padding:10px; border-radius:6px; display:block; font-weight:bold; }
     .add-btn:hover { background:#ffd700; color:#0b1a3d; }
 
-    @media (max-width:768px) { 
-        header { flex-direction: column; padding: 10px; }
-        .nav-controls { width: 100%; justify-content: center; flex-wrap: wrap; }
-        .search-form input { width: 100px; }
-        .desktop-spacer { display:none; }
+    @media (max-width:992px) {
+        header { flex-direction: column; padding: 15px; gap: 15px; }
+        .nav-right { width: 100%; justify-content: center; flex-wrap: wrap; }
+        .search-form input { width: 150px; }
     }
     """
 
@@ -146,7 +179,7 @@ def search():
         <div style="max-width:1200px; margin:20px auto; padding:0 20px;">
             <h2>"{query}" için arama sonuçları ({len(filtered)})</h2>
             <div class="products-grid">{render_products(filtered)}</div>
-            <br><a href="/" style="color:#0b1a3d; font-weight:bold;">⬅️ Tüm Ürünlere Dön</a>
+            <br><a href="/" style="color:#0b1a3d; font-weight:bold; text-decoration:none;">⬅️ Tüm Ürünlere Dön</a>
         </div>
     </body>
     </html>
