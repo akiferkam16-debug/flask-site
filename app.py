@@ -21,10 +21,12 @@ rectangle_products = [
     {"id": 103, "name": "30x10x5 mm Dikdörtgen", "file": "30x10x5 77tl.jpg", "price": "11.00 TL"},
     {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": "14.00 TL"},
      {"id": 105, "name": "10x10x2 mm Dikdörtgen", "file": "21.jpg", "price": "20.00 TL"},
+    {"id": 106, "name": "50x50x25 mm Dikdörtgen", "file": "22.jpg", "price": "1.638.00 TL"},
 ]
 ring_products = [
     {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": "23.00 TL"},
     {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": "25.00 TL"},
+      {"id": 203, "name": "15x5 mm  - 10/5,5 Havşa", "file": "23.jpg", "price": "33.52 TL"}
 ]
 
 all_products_list = products + rectangle_products + ring_products
@@ -238,9 +240,9 @@ def contact():
         {get_header_html()}
         <div class="contact-box">
             <h2 style="color:#0b1a3d;">İletişim Bilgilerimiz</h2>
-            <div class="contact-item"><strong>📞 Sabit:</strong><br> 0212 635 70 22</div>
-            <div class="contact-item"><strong>💬 WhatsApp:</strong><br> 0538 647 20 45</div>
-            <div class="contact-item"><strong>📧 E-posta:</strong><br> erkammiknatis@gmail.com</div>
+            <div class="contact-item"><strong>📞 Sabit:</strong><br> Kullanımda Değil</div>
+            <div class="contact-item"><strong>💬 WhatsApp:</strong><br> +90 530 946 62 44</div>
+            <div class="contact-item"><strong>📧 E-posta:</strong><br> Kullanımda Değil</div>
             <a href="/" style="display:inline-block; margin-top:20px; color:#0b1a3d; font-weight:bold; text-decoration:none;">⬅️ Alışverişe Dön</a>
         </div>
     </body>
