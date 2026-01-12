@@ -12,12 +12,15 @@ products = [
     {"id": 4, "name": "10x5 mm Yuvarlak", "file": "10x5 12 tl.jpg", "price": "12.00 TL"},
     {"id": 5, "name": "18x2 mm Yuvarlak", "file": "7.jpg", "price": "14.00 TL"},
     {"id": 6, "name": "40x5 mm Yuvarlak", "file": "6.jpg", "price": "170.00 TL"},
+     {"id": 7, "name": "12x2 mm Yuvarlak", "file": "19.jpg", "price": "6.24 TL"},
+     {"id": 8, "name": "50x10 mm Yuvarlak", "file": "20.jpg", "price": "647.40 TL"},
 ]
 rectangle_products = [
     {"id": 101, "name": "10x5x2 mm Dikdörtgen", "file": "4.jpg", "price": "6.00 TL"},
     {"id": 102, "name": "20x10x5 mm Dikdörtgen", "file": "20x10x5.jpg", "price": "9.00 TL"},
     {"id": 103, "name": "30x10x5 mm Dikdörtgen", "file": "30x10x5 77tl.jpg", "price": "11.00 TL"},
     {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": "14.00 TL"},
+     {"id": 105, "name": "10x10x2 mm Dikdörtgen", "file": "21.jpg", "price": "20.00 TL"},
 ]
 ring_products = [
     {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": "23.00 TL"},
