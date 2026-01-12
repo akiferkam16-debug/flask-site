@@ -58,11 +58,11 @@ def get_footer_html():
             <h3>Ödeme Yöntemlerimiz</h3>
             <div class="payment-methods">
                 <img src="/static/bonus.png" alt="Bonus">
-                <img src="/static/axess.png" alt="Axess">
-                <img src="/static/cardfinans.png" alt="CardFinans">
-                <img src="/static/maximum.png" alt="Maximum">
-                <img src="/static/paraf.png" alt="Paraf">
-                <img src="/static/world.png" alt="World">
+                <img src="/static/ax.png" alt="Axess">
+                <img src="/static/cardfin.png" alt="CardFinans">
+                <img src="/static/max.png" alt="Maximum">
+                <img src="/static/para.png" alt="Paraf">
+                <img src="/static/vord.png" alt="World">
             </div>
             <p class="footer-copy">© 2026 Erkam Mıknatıs • Tüm Hakları Saklıdır</p>
         </div>
