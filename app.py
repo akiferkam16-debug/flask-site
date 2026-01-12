@@ -51,7 +51,23 @@ def get_header_html():
         </div>
     </header>
     """
-
+def get_footer_html():
+    return """
+    <footer class="footer">
+        <div class="footer-inner">
+            <h3>Ödeme Yöntemlerimiz</h3>
+            <div class="payment-methods">
+                <img src="/static/bonus.png" alt="Bonus">
+                <img src="/static/axess.png" alt="Axess">
+                <img src="/static/cardfinans.png" alt="CardFinans">
+                <img src="/static/maximum.png" alt="Maximum">
+                <img src="/static/paraf.png" alt="Paraf">
+                <img src="/static/world.png" alt="World">
+            </div>
+            <p class="footer-copy">© 2026 Erkam Mıknatıs • Tüm Hakları Saklıdır</p>
+        </div>
+    </footer>
+    """
 def get_common_styles():
     return """
     body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:#f8f9fa; color: #333; }
