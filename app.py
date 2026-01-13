@@ -44,7 +44,10 @@ def get_header_html():
     <header>
         <div class="header-container">
             <div class="logo">
-                <a href="/" style="text-decoration:none;"><h1>Erkam Mıknatıs</h1></a>
+                <a href="/" style="text-decoration:none; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 28px;">🏠</span>
+                    <h1 style="margin:0; color:#0b1a3d; font-size: 24px; font-weight: 800;">Erkam Mıknatıs</h1>
+                </a>
             </div>
             
             <div class="nav-right">
@@ -64,7 +67,6 @@ def get_common_styles():
     body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:#f8f9fa; color: #333; }
     header { background:#fff; border-bottom: 3px solid #0b1a3d; position: sticky; top:0; z-index:1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 10px 0; }
     .header-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 5px 20px; }
-    .logo h1 { color:#0b1a3d; margin:0; font-size: 24px; font-weight: 800; }
     .nav-right { display:flex; gap:10px; align-items:center; }
     .search-form { display:flex; margin-left:10px; }
     .search-form input { padding:8px 12px; border:1px solid #ddd; border-radius:20px 0 0 20px; outline:none; width:150px; }
@@ -184,8 +186,8 @@ def contact():
         {get_header_html()}
         <div class="contact-box">
             <h2 style="color:#0b1a3d;">İletişim Bilgilerimiz</h2>
-             <p><strong>☎️  Sabit Tel:</strong> Kullanımda Değil</p>
-            <p><strong>💬  WhatsApp:</strong> +90 530 946 62 44</p>
+             <p><strong>☎️ Sabit Tel:</strong> Kullanımda Değil</p>
+            <p><strong>💬 WhatsApp:</strong> +90 530 946 62 44</p>
              <p><strong>✉️ E-mail:</strong> Kullanımda Değil</p>
             <a href="/" style="display:inline-block; margin-top:20px; color:#0b1a3d; font-weight:bold; text-decoration:none;">⬅️ Alışverişe Dön</a>
         </div>
