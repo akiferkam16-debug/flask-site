@@ -27,6 +27,15 @@ ring_products = [
     {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": "23.00 TL"},
     {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": "25.00 TL"},
       {"id": 203, "name": "15x5 mm  - 10/5,5 Havşa", "file": "23.jpg", "price": "33.52 TL"}
+      {"id": 204, "name": "18x5 mm  - 10/5,5 Havşa", "file": "24.jpg", "price": "42.00 TL"}
+  {"id": 205, "name": "20x5 mm  - 10/5,5 Havşa", "file": "25.jpg", "price": "56.16 TL"}
+       {"id": 206, "name": "25x5 mm  - 10/5,5 Havşa", "file": "26.jpg", "price": "72.00 TL"}
+         {"id": 208, "name": "40x5 mm  - 10/5 Havşa", "file": "28.jpg", "price": "179.40 TL"}
+           {"id": 207, "name": "30x5 mm  - 10/5 Havşa", "file": "27.jpg", "price": "84.00 TL"}
+     
+
+
+]
 ]
 
 all_products_list = products + rectangle_products + ring_products
