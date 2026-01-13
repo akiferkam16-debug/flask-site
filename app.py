@@ -184,9 +184,9 @@ def contact():
         {get_header_html()}
         <div class="contact-box">
             <h2 style="color:#0b1a3d;">İletişim Bilgilerimiz</h2>
-             <p><strong>Sabit Tel:</strong> Kullanımda Değil</p>
-            <p><strong>WhatsApp:</strong> +90 530 946 62 44</p>
-             <p><strong>E-mail:</strong> Kullanımda Değil</p>
+             <p><strong>☎️  Sabit Tel:</strong> Kullanımda Değil</p>
+            <p><strong>💬  WhatsApp:</strong> +90 530 946 62 44</p>
+             <p><strong>✉️ E-mail:</strong> Kullanımda Değil</p>
             <a href="/" style="display:inline-block; margin-top:20px; color:#0b1a3d; font-weight:bold; text-decoration:none;">⬅️ Alışverişe Dön</a>
         </div>
     </body>
