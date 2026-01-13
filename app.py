@@ -52,11 +52,6 @@ def get_header_html():
     </header>
     """
 
-            </div>
-            <p class="footer-copy">© 2026 Erkam Mıknatıs • Tüm Hakları Saklıdır</p>
-        </div>
-    </footer>
-    """
 def get_common_styles():
     return """
     body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:#f8f9fa; color: #333; }
