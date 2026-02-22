@@ -185,7 +185,7 @@ def contact():
         <div class="contact-box">
             <h2 style="color:#0b1a3d;">İletişim Bilgilerimiz</h2>
              <p><strong>☎️  Sabit Tel:</strong> Kullanımda Değil</p>
-            <p><strong>💬  WhatsApp:</strong> +90 530 946 62 44</p>
+            <p><strong>💬  WhatsApp:</strong> +90 538 643 21 44</p>
              <p><strong>✉️ E-mail:</strong> Kullanımda Değil</p>
             <a href="/" style="display:inline-block; margin-top:20px; color:#0b1a3d; font-weight:bold; text-decoration:none;">⬅️ Alışverişe Dön</a>
         </div>
@@ -262,7 +262,7 @@ def cart_page():
                 <h3>Toplam: {total:,.2f} TL</h3>
             </div>
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
-                <a href="https://wa.me/905309466244" style="text-decoration:none; background:#28a745; color:white; padding:15px; border-radius:8px; font-weight:bold; text-align:center;">✅ WhatsApp ile Siparişi Tamamla</a>
+                <a href="https://wa.me/905386432144" style="text-decoration:none; background:#28a745; color:white; padding:15px; border-radius:8px; font-weight:bold; text-align:center;">✅ WhatsApp ile Siparişi Tamamla</a>
                 <a href="/" style="text-decoration:none; color:#0b1a3d; font-weight:bold; text-align:center;">⬅️ Alışverişe Devam Et</a>
             </div>
         </div>
