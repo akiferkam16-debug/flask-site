@@ -1,42 +1,61 @@
 from flask import Flask, session, redirect, request, render_template_string, url_for
 import os
+import json
 
 app = Flask(__name__) 
 app.secret_key = os.environ.get("SECRET_KEY", "Erkam_Miknatis_Guvenli_Anahtar_2024") 
 
-# --- Ürün Veri Bankası ---
-products = [
-    {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": "3.00 TL"},
-    {"id": 2, "name": "8x3 mm Yuvarlak", "file": "2.jpg", "price": "6.00 TL"},
-    {"id": 3, "name": "15x3 mm Yuvarlak", "file": "3.jpg", "price": "12.00 TL"},
-    {"id": 4, "name": "10x5 mm Yuvarlak", "file": "10x5 12 tl.jpg", "price": "12.00 TL"},
-    {"id": 5, "name": "18x2 mm Yuvarlak", "file": "7.jpg", "price": "14.00 TL"},
-    {"id": 6, "name": "40x5 mm Yuvarlak", "file": "6.jpg", "price": "170.00 TL"},
-    {"id": 7, "name": "12x2 mm Yuvarlak", "file": "19.jpg", "price": "6.24 TL"},
-    {"id": 8, "name": "50x10 mm Yuvarlak", "file": "20.jpg", "price": "647.40 TL"}
-]
+# --- Admin Ayarları ---
+ADMIN_PASSWORD = "admin123" # Admin paneline giriş şifresi (Bunu değiştirebilirsiniz)
+DATA_FILE = "products.json"
 
-rectangle_products = [
-    {"id": 101, "name": "10x5x2 mm Dikdörtgen", "file": "4.jpg", "price": "6.00 TL"},
-    {"id": 102, "name": "20x10x5 mm Dikdörtgen", "file": "20x10x5.jpg", "price": "9.00 TL"},
-    {"id": 103, "name": "30x10x5 mm Dikdörtgen", "file": "30x10x5 77tl.jpg", "price": "11.00 TL"},
-    {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": "14.00 TL"},
-    {"id": 105, "name": "10x10x2 mm Dikdörtgen", "file": "21.jpg", "price": "20.00 TL"},
-    {"id": 106, "name": "50x50x25 mm Dikdörtgen", "file": "22.jpg", "price": "1.638.00 TL"}
-]
+# --- Başlangıç Ürün Veri Bankası (Sadece JSON yoksa kullanılır) ---
+DEFAULT_DATA = {
+    "yuvarlak": [
+        {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": "3.00 TL"},
+        {"id": 2, "name": "8x3 mm Yuvarlak", "file": "2.jpg", "price": "6.00 TL"},
+        {"id": 3, "name": "15x3 mm Yuvarlak", "file": "3.jpg", "price": "12.00 TL"},
+        {"id": 4, "name": "10x5 mm Yuvarlak", "file": "10x5 12 tl.jpg", "price": "12.00 TL"},
+        {"id": 5, "name": "18x2 mm Yuvarlak", "file": "7.jpg", "price": "14.00 TL"},
+        {"id": 6, "name": "40x5 mm Yuvarlak", "file": "6.jpg", "price": "170.00 TL"},
+        {"id": 7, "name": "12x2 mm Yuvarlak", "file": "19.jpg", "price": "6.24 TL"},
+        {"id": 8, "name": "50x10 mm Yuvarlak", "file": "20.jpg", "price": "647.40 TL"}
+    ],
+    "dikdortgen": [
+        {"id": 101, "name": "10x5x2 mm Dikdörtgen", "file": "4.jpg", "price": "6.00 TL"},
+        {"id": 102, "name": "20x10x5 mm Dikdörtgen", "file": "20x10x5.jpg", "price": "9.00 TL"},
+        {"id": 103, "name": "30x10x5 mm Dikdörtgen", "file": "30x10x5 77tl.jpg", "price": "11.00 TL"},
+        {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": "14.00 TL"},
+        {"id": 105, "name": "10x10x2 mm Dikdörtgen", "file": "21.jpg", "price": "20.00 TL"},
+        {"id": 106, "name": "50x50x25 mm Dikdörtgen", "file": "22.jpg", "price": "1.638.00 TL"}
+    ],
+    "halka": [
+        {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": "23.00 TL"},
+        {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": "25.00 TL"},
+        {"id": 203, "name": "15x5 mm - 10/5,5 Havşa", "file": "23.jpg", "price": "33.52 TL"},
+        {"id": 204, "name": "18x5 mm - 10/5,5 Havşa", "file": "24.jpg", "price": "42.00 TL"},
+        {"id": 205, "name": "20x5 mm - 10/5,5 Havşa", "file": "25.jpg", "price": "56.16 TL"},
+        {"id": 206, "name": "25x5 mm - 10/5,5 Havşa", "file": "26.jpg", "price": "72.00 TL"},
+        {"id": 207, "name": "30x5 mm - 10/5 Havşa", "file": "27.jpg", "price": "84.00 TL"},
+        {"id": 208, "name": "40x5 mm - 10/5 Havşa", "file": "28.jpg", "price": "179.40 TL"}
+    ]
+}
 
-ring_products = [
-    {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": "23.00 TL"},
-    {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": "25.00 TL"},
-    {"id": 203, "name": "15x5 mm - 10/5,5 Havşa", "file": "23.jpg", "price": "33.52 TL"},
-    {"id": 204, "name": "18x5 mm - 10/5,5 Havşa", "file": "24.jpg", "price": "42.00 TL"},
-    {"id": 205, "name": "20x5 mm - 10/5,5 Havşa", "file": "25.jpg", "price": "56.16 TL"},
-    {"id": 206, "name": "25x5 mm - 10/5,5 Havşa", "file": "26.jpg", "price": "72.00 TL"},
-    {"id": 207, "name": "30x5 mm - 10/5 Havşa", "file": "27.jpg", "price": "84.00 TL"},
-    {"id": 208, "name": "40x5 mm - 10/5 Havşa", "file": "28.jpg", "price": "179.40 TL"}
-]
+# --- Veritabanı İşlemleri (JSON) ---
+def load_data():
+    if not os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(DEFAULT_DATA, f, ensure_ascii=False, indent=4)
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-all_products_list = products + rectangle_products + ring_products
+def save_data(data):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+def get_all_products_list():
+    data = load_data()
+    return data["yuvarlak"] + data["dikdortgen"] + data["halka"]
 
 # --- Ortak Stil ve Header Fonksiyonu ---
 def get_header_html():
@@ -50,6 +69,7 @@ def get_header_html():
             <div class="nav-right">
                 <a class="nav-btn contact-btn" href="/iletisim">📞 İletişim</a>
                 <a class="nav-btn cart-btn" href="/cart">🛒 Sepet</a>
+                <a class="nav-btn admin-btn" href="/admin" style="background:#8e44ad;">⚙️ Admin</a>
                 <form action="/search" method="GET" class="search-form">
                     <input type="text" name="q" placeholder="Ürün ara..." required>
                     <button type="submit">🔍</button>
@@ -65,7 +85,7 @@ def get_common_styles():
     header { background:#fff; border-bottom: 3px solid #0b1a3d; position: sticky; top:0; z-index:1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 10px 0; }
     .header-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 5px 20px; }
     .logo h1 { color:#0b1a3d; margin:0; font-size: 24px; font-weight: 800; }
-    .nav-right { display:flex; gap:10px; align-items:center; }
+    .nav-right { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
     .search-form { display:flex; margin-left:10px; }
     .search-form input { padding:8px 12px; border:1px solid #ddd; border-radius:20px 0 0 20px; outline:none; width:150px; }
     .search-form button { padding:8px 15px; border:none; background:#0b1a3d; color:white; border-radius:0 20px 20px 0; cursor:pointer; }
@@ -80,6 +100,14 @@ def get_common_styles():
     .price { color: #e67e22; font-size: 1.2em; font-weight: bold; margin-bottom:12px; }
     .add-btn { background:#0b1a3d; color:#fff; text-decoration:none; padding:10px; border-radius:6px; font-weight:bold; }
     .add-btn:hover { background:#ffd700; color:#0b1a3d; }
+    
+    /* Admin Paneli Stilleri */
+    .admin-table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
+    .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    .admin-table th { background: #0b1a3d; color: white; }
+    .admin-table tr:hover { background: #f1f1f1; }
+    .edit-btn { background: #f39c12; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 12px; }
+    
     @media (max-width:768px) {
         .header-container { flex-direction: column; gap: 12px; padding: 10px; }
         .nav-right { width: 100%; justify-content: center; }
@@ -109,22 +137,23 @@ def render_products(prod_list):
         """
     return html
 
-# --- Route'lar ---
+# --- Müşteri (Önyüz) Route'ları ---
 
 @app.route("/")
 def index():
+    data = load_data()
     all_content = f"""
     <div id="yuvarlak" class="products-section">
         <h2 style="background:#0b1a3d; color:white; padding:12px; border-radius:8px; font-size:1.2em;">Yuvarlak Mıknatıslar</h2>
-        <div class="products-grid">{render_products(products)}</div>
+        <div class="products-grid">{render_products(data["yuvarlak"])}</div>
     </div>
     <div id="dikdortgen" class="products-section">
         <h2 style="background:#0b1a3d; color:white; padding:12px; border-radius:8px; font-size:1.2em;">Dikdörtgen Mıknatıslar</h2>
-        <div class="products-grid">{render_products(rectangle_products)}</div>
+        <div class="products-grid">{render_products(data["dikdortgen"])}</div>
     </div>
     <div id="havsali" class="products-section">
         <h2 style="background:#0b1a3d; color:white; padding:12px; border-radius:8px; font-size:1.2em;">Halka (Havşalı) Mıknatıslar</h2>
-        <div class="products-grid">{render_products(ring_products)}</div>
+        <div class="products-grid">{render_products(data["halka"])}</div>
     </div>
     """
     return render_template_string(f"""
@@ -147,7 +176,8 @@ def index():
 @app.route("/search")
 def search():
     query = request.args.get("q", "").lower()
-    filtered = [p for p in all_products_list if query in p['name'].lower()]
+    all_products = get_all_products_list()
+    filtered = [p for p in all_products if query in p['name'].lower()]
     return render_template_string(f"""
     <html>
     <head>
@@ -184,8 +214,8 @@ def contact():
         {get_header_html()}
         <div class="contact-box">
             <h2 style="color:#0b1a3d;">İletişim Bilgilerimiz</h2>
-             <p><strong>☎️  Sabit Tel:</strong> Kullanımda Değil</p>
-            <p><strong>💬  WhatsApp:</strong> +90 536 274 59 9</p>
+             <p><strong>☎️ Sabit Tel:</strong> Kullanımda Değil</p>
+            <p><strong>💬 WhatsApp:</strong> +90 536 274 59 99</p>
              <p><strong>✉️ E-mail:</strong> Kullanımda Değil</p>
             <a href="/" style="display:inline-block; margin-top:20px; color:#0b1a3d; font-weight:bold; text-decoration:none;">⬅️ Alışverişe Dön</a>
         </div>
@@ -200,7 +230,8 @@ def add_to_cart(product_id):
     if str_id in cart:
         cart[str_id]['quantity'] += 1
     else:
-        p = next((item for item in all_products_list if item["id"] == product_id), None)
+        all_products = get_all_products_list()
+        p = next((item for item in all_products if item["id"] == product_id), None)
         if p:
             cart[str_id] = {"id": p["id"], "name": p["name"], "price": p["price"], "quantity": 1}
     session["cart"] = cart
@@ -227,7 +258,6 @@ def cart_page():
     total = 0.0
     for k, v in cart.items():
         try:
-            # "12.00 TL" -> 12.0
             price_val = float(v["price"].replace(" TL", "").replace(".", "").replace(",", "."))
         except:
             price_val = 0.0
@@ -265,6 +295,144 @@ def cart_page():
                 <a href="https://wa.me/90536274599" style="text-decoration:none; background:#28a745; color:white; padding:15px; border-radius:8px; font-weight:bold; text-align:center;">✅ WhatsApp ile Siparişi Tamamla</a>
                 <a href="/" style="text-decoration:none; color:#0b1a3d; font-weight:bold; text-align:center;">⬅️ Alışverişe Devam Et</a>
             </div>
+        </div>
+    </body>
+    </html>
+    """)
+
+# --- YÖNETİCİ (ADMIN) ROUTE'LARI ---
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    error = ""
+    if request.method == "POST":
+        if request.form.get("password") == ADMIN_PASSWORD:
+            session["is_admin"] = True
+            return redirect(url_for("admin_panel"))
+        else:
+            error = "Hatalı şifre!"
+            
+    return render_template_string(f"""
+    <html>
+    <head><meta charset="utf-8"><title>Admin Girişi</title><style>{get_common_styles()}</style></head>
+    <body>
+        {get_header_html()}
+        <div style="max-width:400px; margin:50px auto; background:white; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); text-align:center;">
+            <h2>Admin Girişi</h2>
+            <p style="color:red;">{error}</p>
+            <form method="POST">
+                <input type="password" name="password" placeholder="Şifre" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px;" required>
+                <button type="submit" style="background:#0b1a3d; color:white; border:none; padding:10px 20px; width:100%; border-radius:5px; cursor:pointer;">Giriş Yap</button>
+            </form>
+        </div>
+    </body></html>
+    """)
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop("is_admin", None)
+    return redirect(url_for("index"))
+
+@app.route("/admin")
+def admin_panel():
+    if not session.get("is_admin"):
+        return redirect(url_for("admin_login"))
+        
+    data = load_data()
+    
+    def generate_table(category_key, title):
+        rows = ""
+        for p in data[category_key]:
+            rows += f"""
+            <tr>
+                <td>{p['id']}</td>
+                <td>{p['name']}</td>
+                <td>{p['price']}</td>
+                <td>{p['file']}</td>
+                <td><a href="/admin/edit/{category_key}/{p['id']}" class="edit-btn">✏️ Düzenle</a></td>
+            </tr>
+            """
+        return f"""
+        <h3 style="margin-top:30px; color:#0b1a3d;">{title}</h3>
+        <table class="admin-table">
+            <tr><th>ID</th><th>Ürün Adı</th><th>Fiyat</th><th>Görsel Dosyası</th><th>İşlem</th></tr>
+            {rows}
+        </table>
+        """
+
+    html = f"""
+    <html>
+    <head><meta charset="utf-8"><title>Admin Paneli</title><style>{get_common_styles()}</style></head>
+    <body>
+        {get_header_html()}
+        <div style="max-width:1200px; margin:20px auto; padding:20px; background:white; border-radius:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>⚙️ Ürün Yönetim Paneli</h2>
+                <a href="/admin/logout" style="color:red; text-decoration:none; font-weight:bold;">🚪 Çıkış Yap</a>
+            </div>
+            <p>Buradan ürün bilgilerini değiştirebilirsiniz. Değişiklikler anında sitede güncellenir.</p>
+            
+            {generate_table("yuvarlak", "Yuvarlak Mıknatıslar")}
+            {generate_table("dikdortgen", "Dikdörtgen Mıknatıslar")}
+            {generate_table("halka", "Halka (Havşalı) Mıknatıslar")}
+            
+        </div>
+    </body>
+    </html>
+    """
+    return render_template_string(html)
+
+@app.route("/admin/edit/<category>/<int:product_id>", methods=["GET", "POST"])
+def edit_product(category, product_id):
+    if not session.get("is_admin"):
+        return redirect(url_for("admin_login"))
+        
+    data = load_data()
+    if category not in data:
+        return "Geçersiz kategori."
+        
+    # Ürünü bul
+    product_idx = next((index for (index, d) in enumerate(data[category]) if d["id"] == product_id), None)
+    if product_idx is None:
+        return "Ürün bulunamadı."
+        
+    product = data[category][product_idx]
+    
+    if request.method == "POST":
+        # Formdan gelen yeni verileri kaydet
+        data[category][product_idx]["name"] = request.form.get("name")
+        data[category][product_idx]["price"] = request.form.get("price")
+        data[category][product_idx]["file"] = request.form.get("file")
+        
+        save_data(data) # JSON dosyasına yaz
+        return redirect(url_for("admin_panel"))
+
+    # Düzenleme Formu
+    return render_template_string(f"""
+    <html>
+    <head><meta charset="utf-8"><title>Ürün Düzenle</title><style>{get_common_styles()}</style></head>
+    <body>
+        {get_header_html()}
+        <div style="max-width:500px; margin:50px auto; background:white; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);">
+            <h2 style="color:#0b1a3d;">✏️ Ürün Düzenle</h2>
+            <form method="POST">
+                <div style="margin-bottom:15px;">
+                    <label style="font-weight:bold;">Ürün Adı:</label>
+                    <input type="text" name="name" value="{product['name']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="font-weight:bold;">Fiyat (Örn: 15.00 TL):</label>
+                    <input type="text" name="price" value="{product['price']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
+                </div>
+                <div style="margin-bottom:25px;">
+                    <label style="font-weight:bold;">Görsel Dosya Adı (Örn: 1.jpg):</label>
+                    <input type="text" name="file" value="{product['file']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <a href="/admin" style="background:#ccc; color:black; padding:10px 20px; text-decoration:none; border-radius:5px;">İptal</a>
+                    <button type="submit" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">💾 Kaydet</button>
+                </div>
+            </form>
         </div>
     </body>
     </html>
