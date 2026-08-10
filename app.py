@@ -18,12 +18,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# --- Veritabanı Ayarları ---
-db_url = os.environ.get("DATABASE_URL", "sqlite:///products.db")
-if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+# --- Veritabanı Ayarları (Sabit SQLite Çözümü) ---
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///products.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -224,7 +220,6 @@ def admin_panel():
         description = request.form.get("description")
         
         image_url = None
-        # Bilgisayardan dosya yükleme kontrolü
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename != '' and allowed_file(file.filename):
