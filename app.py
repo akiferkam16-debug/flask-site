@@ -9,7 +9,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "Erkam_Miknatis_Guvenli_Anahtar_20
 ADMIN_PASSWORD = "admin123" 
 DATA_FILE = "products.json"
 
-# --- Başlangıç Ürün Veri Bankası (Fiyatlar kuruş hesabı için float olarak güncellendi) ---
+# --- Başlangıç Ürün Veri Bankası ---
 DEFAULT_DATA = {
     "yuvarlak": [
         {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": 3.00},
@@ -249,15 +249,31 @@ def add_to_cart(product_id):
     session.modified = True
     return redirect(url_for("cart_page"))
 
+@app.route("/update_cart", methods=["POST"])
+def update_cart():
+    cart = get_cart()
+    for key in request.form:
+        if key.startswith("qty_"):
+            prod_id = key.split("_")[1]
+            if prod_id in cart:
+                try:
+                    new_qty = int(request.form.get(key))
+                    if new_qty > 0:
+                        cart[prod_id]['quantity'] = new_qty
+                    else:
+                        del cart[prod_id]
+                except ValueError:
+                    pass
+    session["cart"] = cart
+    session.modified = True
+    return redirect(url_for("cart_page"))
+
 @app.route("/remove_from_cart/<int:product_id>")
 def remove_from_cart(product_id):
     cart = get_cart()
     str_id = str(product_id)
     if str_id in cart:
-        if cart[str_id]['quantity'] > 1:
-            cart[str_id]['quantity'] -= 1
-        else:
-            del cart[str_id]
+        del cart[str_id]
     session["cart"] = cart
     session.modified = True
     return redirect(url_for("cart_page"))
@@ -276,14 +292,13 @@ def cart_page():
         whatsapp_text += f"- {v['name']} x {v['quantity']} Adet = {sub:,.2f} TL%0A"
         
         items_html += f"""
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:15px 0;">
-            <div style="flex:2;"><b>{v['name']}</b><br><small>{price_val:,.2f} TL / Adet</small></div>
-            <div style="flex:1; text-align:center;">
-                <a href="/remove_from_cart/{v['id']}" style="text-decoration:none; padding:5px 10px; background:#eee; color:black; border-radius:5px;">-</a>
-                <span style="margin:0 10px; font-weight:bold;">{v['quantity']}</span>
-                <a href="/add_to_cart/{v['id']}" style="text-decoration:none; padding:5px 10px; background:#eee; color:black; border-radius:5px;">+</a>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:15px 0; gap:10px; flex-wrap:wrap;">
+            <div style="flex:2; min-width:150px;"><b>{v['name']}</b><br><small>{price_val:,.2f} TL / Adet</small></div>
+            <div style="flex:1; text-align:center; display:flex; align-items:center; justify-content:center; gap:5px;">
+                <input type="number" name="qty_{v['id']}" value="{v['quantity']}" min="1" style="width:70px; padding:6px; text-align:center; border:1px solid #ccc; border-radius:5px; font-weight:bold;">
+                <a href="/remove_from_cart/{v['id']}" style="text-decoration:none; background:#ff4d4d; color:white; padding:6px 10px; border-radius:5px; font-size:12px;" title="Ürünü Sil">🗑️</a>
             </div>
-            <div style="flex:1; text-align:right; font-weight:bold; color:#e67e22;">{sub:,.2f} TL</div>
+            <div style="flex:1; text-align:right; font-weight:bold; color:#e67e22; min-width:90px;">{sub:,.2f} TL</div>
         </div>"""
 
     whatsapp_text += f"%0AToplam Tutar: {total:,.2f} TL"
@@ -305,15 +320,18 @@ def cart_page():
     </head>
     <body>
         {get_header_html()}
-        <div style="max-width:600px; margin:20px auto; background:white; padding:20px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+        <div style="max-width:700px; margin:20px auto; background:white; padding:20px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
             <h1>🛒 Sepetiniz</h1>
-            {items_html if items_html else "<p>Sepetiniz boş.</p>"}
+            <form action="/update_cart" method="POST">
+                {items_html if items_html else "<p>Sepetiniz boş.</p>"}
+                {"" if not items_html else '<div style="margin-top:15px; text-align:right;"><button type="submit" style="background:#f39c12; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">🔄 Adetleri Güncelle</button></div>'}
+            </form>
             <div style="text-align:right; margin-top:20px;">
                 <h3>Toplam: {total:,.2f} TL</h3>
             </div>
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
                 {checkout_button}
-                <a href="/" style="text-decoration:none; color:#0b1a3d; font-weight:bold; text-align:center; display:block; margin-top:10px;">⬅️ Alışverişe Devam Et</a>
+                <a href="/" style="text-decoration:none; color:#0b1a3d; font-weight:bold; text-align:center; display:block; margin-top:5px;">⬅️ Alışverişe Devam Et</a>
             </div>
         </div>
     </body>
