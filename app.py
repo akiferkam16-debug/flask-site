@@ -6,42 +6,41 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "Erkam_Miknatis_Guvenli_Anahtar_2024") 
 
 # --- Admin Ayarları ---
-ADMIN_PASSWORD = "admin123" # Admin paneline giriş şifresi (Bunu değiştirebilirsiniz)
+ADMIN_PASSWORD = "admin123" 
 DATA_FILE = "products.json"
 
-# --- Başlangıç Ürün Veri Bankası (Sadece JSON yoksa kullanılır) ---
+# --- Başlangıç Ürün Veri Bankası (Fiyatlar kuruş hesabı için float olarak güncellendi) ---
 DEFAULT_DATA = {
     "yuvarlak": [
-        {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": "3.00 TL"},
-        {"id": 2, "name": "8x3 mm Yuvarlak", "file": "2.jpg", "price": "6.00 TL"},
-        {"id": 3, "name": "15x3 mm Yuvarlak", "file": "3.jpg", "price": "12.00 TL"},
-        {"id": 4, "name": "10x5 mm Yuvarlak", "file": "10x5 12 tl.jpg", "price": "12.00 TL"},
-        {"id": 5, "name": "18x2 mm Yuvarlak", "file": "7.jpg", "price": "14.00 TL"},
-        {"id": 6, "name": "40x5 mm Yuvarlak", "file": "6.jpg", "price": "170.00 TL"},
-        {"id": 7, "name": "12x2 mm Yuvarlak", "file": "19.jpg", "price": "6.24 TL"},
-        {"id": 8, "name": "50x10 mm Yuvarlak", "file": "20.jpg", "price": "647.40 TL"}
+        {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": 3.00},
+        {"id": 2, "name": "8x3 mm Yuvarlak", "file": "2.jpg", "price": 6.00},
+        {"id": 3, "name": "15x3 mm Yuvarlak", "file": "3.jpg", "price": 12.00},
+        {"id": 4, "name": "10x5 mm Yuvarlak", "file": "10x5 12 tl.jpg", "price": 12.00},
+        {"id": 5, "name": "18x2 mm Yuvarlak", "file": "7.jpg", "price": 14.00},
+        {"id": 6, "name": "40x5 mm Yuvarlak", "file": "6.jpg", "price": 170.00},
+        {"id": 7, "name": "12x2 mm Yuvarlak", "file": "19.jpg", "price": 6.24},
+        {"id": 8, "name": "50x10 mm Yuvarlak", "file": "20.jpg", "price": 647.40}
     ],
     "dikdortgen": [
-        {"id": 101, "name": "10x5x2 mm Dikdörtgen", "file": "4.jpg", "price": "6.00 TL"},
-        {"id": 102, "name": "20x10x5 mm Dikdörtgen", "file": "20x10x5.jpg", "price": "9.00 TL"},
-        {"id": 103, "name": "30x10x5 mm Dikdörtgen", "file": "30x10x5 77tl.jpg", "price": "11.00 TL"},
-        {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": "14.00 TL"},
-        {"id": 105, "name": "10x10x2 mm Dikdörtgen", "file": "21.jpg", "price": "20.00 TL"},
-        {"id": 106, "name": "50x50x25 mm Dikdörtgen", "file": "22.jpg", "price": "1.638.00 TL"}
+        {"id": 101, "name": "10x5x2 mm Dikdörtgen", "file": "4.jpg", "price": 6.00},
+        {"id": 102, "name": "20x10x5 mm Dikdörtgen", "file": "20x10x5.jpg", "price": 9.00},
+        {"id": 103, "name": "30x10x5 mm Dikdörtgen", "file": "30x10x5 77tl.jpg", "price": 11.00},
+        {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": 14.00},
+        {"id": 105, "name": "10x10x2 mm Dikdörtgen", "file": "21.jpg", "price": 20.00},
+        {"id": 106, "name": "50x50x25 mm Dikdörtgen", "file": "22.jpg", "price": 1638.00}
     ],
     "halka": [
-        {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": "23.00 TL"},
-        {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": "25.00 TL"},
-        {"id": 203, "name": "15x5 mm - 10/5,5 Havşa", "file": "23.jpg", "price": "33.52 TL"},
-        {"id": 204, "name": "18x5 mm - 10/5,5 Havşa", "file": "24.jpg", "price": "42.00 TL"},
-        {"id": 205, "name": "20x5 mm - 10/5,5 Havşa", "file": "25.jpg", "price": "56.16 TL"},
-        {"id": 206, "name": "25x5 mm - 10/5,5 Havşa", "file": "26.jpg", "price": "72.00 TL"},
-        {"id": 207, "name": "30x5 mm - 10/5 Havşa", "file": "27.jpg", "price": "84.00 TL"},
-        {"id": 208, "name": "40x5 mm - 10/5 Havşa", "file": "28.jpg", "price": "179.40 TL"}
+        {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": 23.00},
+        {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": 25.00},
+        {"id": 203, "name": "15x5 mm - 10/5,5 Havşa", "file": "23.jpg", "price": 33.52},
+        {"id": 204, "name": "18x5 mm - 10/5,5 Havşa", "file": "24.jpg", "price": 42.00},
+        {"id": 205, "name": "20x5 mm - 10/5,5 Havşa", "file": "25.jpg", "price": 56.16},
+        {"id": 206, "name": "25x5 mm - 10/5,5 Havşa", "file": "26.jpg", "price": 72.00},
+        {"id": 207, "name": "30x5 mm - 10/5 Havşa", "file": "27.jpg", "price": 84.00},
+        {"id": 208, "name": "40x5 mm - 10/5 Havşa", "file": "28.jpg", "price": 179.40}
     ]
 }
 
-# --- Veritabanı İşlemleri (JSON) ---
 def load_data():
     if not os.path.exists(DATA_FILE):
         with open(DATA_FILE, "w", encoding="utf-8") as f:
@@ -57,7 +56,6 @@ def get_all_products_list():
     data = load_data()
     return data["yuvarlak"] + data["dikdortgen"] + data["halka"]
 
-# --- Ortak Stil ve Header Fonksiyonu ---
 def get_header_html():
     return """
     <header>
@@ -65,7 +63,6 @@ def get_header_html():
             <div class="logo">
                 <a href="/" style="text-decoration:none;"><h1>Erkam Mıknatıs</h1></a>
             </div>
-            
             <div class="nav-right">
                 <a class="nav-btn contact-btn" href="/iletisim">📞 İletişim</a>
                 <a class="nav-btn cart-btn" href="/cart">🛒 Sepet</a>
@@ -92,16 +89,21 @@ def get_common_styles():
     .nav-btn { text-decoration:none; font-weight:bold; padding:8px 15px; border-radius:20px; transition: 0.3s; color:#fff; font-size: 13px; white-space: nowrap; }
     .contact-btn { background:#27ae60; }
     .cart-btn { background:#0b1a3d; }
+    
+    .notice-bar { background: #fff3cd; color: #856404; padding: 12px; text-align: center; font-weight: 600; border-bottom: 1px solid #ffeeba; font-size: 14px; }
+    .category-nav { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+    .cat-link { background: #e9ecef; color: #0b1a3d; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; }
+    .cat-link:hover { background: #0b1a3d; color: white; }
+
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
     .product-card { background:#fff; padding:15px; border-radius:12px; text-align:center; transition: 0.3s; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; }
     .product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     .product-card img { width:100%; height:180px; object-fit:contain; background: #fff; border-radius:8px; }
     .title { font-weight: bold; margin: 12px 0; height: 40px; overflow: hidden; color:#0b1a3d; font-size: 15px; }
     .price { color: #e67e22; font-size: 1.2em; font-weight: bold; margin-bottom:12px; }
-    .add-btn { background:#0b1a3d; color:#fff; text-decoration:none; padding:10px; border-radius:6px; font-weight:bold; }
+    .add-btn { background:#0b1a3d; color:#fff; text-decoration:none; padding:10px; border-radius:6px; font-weight:bold; display: block; }
     .add-btn:hover { background:#ffd700; color:#0b1a3d; }
     
-    /* Admin Paneli Stilleri */
     .admin-table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
     .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
     .admin-table th { background: #0b1a3d; color: white; }
@@ -125,24 +127,33 @@ def render_products(prod_list):
         return "<p style='color:black;'>Ürün bulunamadı.</p>"
     html = ""
     for p in prod_list:
+        price_formatted = f"{float(p['price']):,.2f} TL"
         html += f"""
         <div class="product-card">
             <img src="/static/{p['file']}" alt="{p['name']}">
             <div>
                 <div class="title">{p['name']}</div>
-                <div class="price">{p['price']}</div>
+                <div class="price">{price_formatted}</div>
                 <a class="add-btn" href="/add_to_cart/{p['id']}">Sepete Ekle</a>
             </div>
         </div>
         """
     return html
 
-# --- Müşteri (Önyüz) Route'ları ---
-
 @app.route("/")
 def index():
     data = load_data()
     all_content = f"""
+    <div class="notice-bar">
+        ⚠️ <strong>Bilgilendirme:</strong> Sitemizde numunelik (tekli/perakende düşük tutarlı) satışı bulunmamaktadır. <strong>Minimum sepet tutarı 100 TL'dir.</strong>
+    </div>
+    
+    <div class="category-nav">
+        <a href="#yuvarlak" class="cat-link">🔵 Yuvarlak Mıknatıslar</a>
+        <a href="#dikdortgen" class="cat-link">🟩 Dikdörtgen Mıknatıslar</a>
+        <a href="#havsali" class="cat-link">⭕ Havşalı Mıknatıslar</a>
+    </div>
+
     <div id="yuvarlak" class="products-section">
         <h2 style="background:#0b1a3d; color:white; padding:12px; border-radius:8px; font-size:1.2em;">Yuvarlak Mıknatıslar</h2>
         <div class="products-grid">{render_products(data["yuvarlak"])}</div>
@@ -233,7 +244,7 @@ def add_to_cart(product_id):
         all_products = get_all_products_list()
         p = next((item for item in all_products if item["id"] == product_id), None)
         if p:
-            cart[str_id] = {"id": p["id"], "name": p["name"], "price": p["price"], "quantity": 1}
+            cart[str_id] = {"id": p["id"], "name": p["name"], "price": float(p["price"]), "quantity": 1}
     session["cart"] = cart
     session.modified = True
     return redirect(url_for("cart_page"))
@@ -256,24 +267,33 @@ def cart_page():
     cart = get_cart()
     items_html = ""
     total = 0.0
+    whatsapp_text = "Merhaba, Erkam Mıknatıs'tan şu siparişi vermek istiyorum:%0A"
+
     for k, v in cart.items():
-        try:
-            price_val = float(v["price"].replace(" TL", "").replace(".", "").replace(",", "."))
-        except:
-            price_val = 0.0
-        
+        price_val = float(v["price"])
         sub = price_val * v["quantity"]
         total += sub
+        whatsapp_text += f"- {v['name']} x {v['quantity']} Adet = {sub:,.2f} TL%0A"
+        
         items_html += f"""
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:15px 0;">
-            <div style="flex:2;"><b>{v['name']}</b></div>
+            <div style="flex:2;"><b>{v['name']}</b><br><small>{price_val:,.2f} TL / Adet</small></div>
             <div style="flex:1; text-align:center;">
                 <a href="/remove_from_cart/{v['id']}" style="text-decoration:none; padding:5px 10px; background:#eee; color:black; border-radius:5px;">-</a>
-                <span style="margin:0 10px;">{v['quantity']}</span>
+                <span style="margin:0 10px; font-weight:bold;">{v['quantity']}</span>
                 <a href="/add_to_cart/{v['id']}" style="text-decoration:none; padding:5px 10px; background:#eee; color:black; border-radius:5px;">+</a>
             </div>
             <div style="flex:1; text-align:right; font-weight:bold; color:#e67e22;">{sub:,.2f} TL</div>
         </div>"""
+
+    whatsapp_text += f"%0AToplam Tutar: {total:,.2f} TL"
+
+    checkout_button = ""
+    if total >= 100.0:
+        checkout_button = f'<a href="https://wa.me/905362745999?text={whatsapp_text}" style="text-decoration:none; background:#28a745; color:white; padding:15px; border-radius:8px; font-weight:bold; text-align:center; display:block;">✅ WhatsApp ile Siparişi Tamamla</a>'
+    else:
+        missing = 100.0 - total
+        checkout_button = f'<div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:8px; text-align:center; font-weight:bold;">⚠️ Minimum sepet tutarı 100 TL\'dir. Sepete {missing:,.2f} TL daha ürün eklemelisiniz.</div>'
 
     return render_template_string(f"""
     <html>
@@ -292,15 +312,13 @@ def cart_page():
                 <h3>Toplam: {total:,.2f} TL</h3>
             </div>
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
-                <a href="https://wa.me/90536274599" style="text-decoration:none; background:#28a745; color:white; padding:15px; border-radius:8px; font-weight:bold; text-align:center;">✅ WhatsApp ile Siparişi Tamamla</a>
-                <a href="/" style="text-decoration:none; color:#0b1a3d; font-weight:bold; text-align:center;">⬅️ Alışverişe Devam Et</a>
+                {checkout_button}
+                <a href="/" style="text-decoration:none; color:#0b1a3d; font-weight:bold; text-align:center; display:block; margin-top:10px;">⬅️ Alışverişe Devam Et</a>
             </div>
         </div>
     </body>
     </html>
     """)
-
-# --- YÖNETİCİ (ADMIN) ROUTE'LARI ---
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
@@ -347,7 +365,7 @@ def admin_panel():
             <tr>
                 <td>{p['id']}</td>
                 <td>{p['name']}</td>
-                <td>{p['price']}</td>
+                <td>{float(p['price']):,.2f} TL</td>
                 <td>{p['file']}</td>
                 <td><a href="/admin/edit/{category_key}/{p['id']}" class="edit-btn">✏️ Düzenle</a></td>
             </tr>
@@ -391,7 +409,6 @@ def edit_product(category, product_id):
     if category not in data:
         return "Geçersiz kategori."
         
-    # Ürünü bul
     product_idx = next((index for (index, d) in enumerate(data[category]) if d["id"] == product_id), None)
     if product_idx is None:
         return "Ürün bulunamadı."
@@ -399,15 +416,18 @@ def edit_product(category, product_id):
     product = data[category][product_idx]
     
     if request.method == "POST":
-        # Formdan gelen yeni verileri kaydet
+        try:
+            new_price = float(request.form.get("price").replace(",", "."))
+        except:
+            new_price = product["price"]
+
         data[category][product_idx]["name"] = request.form.get("name")
-        data[category][product_idx]["price"] = request.form.get("price")
+        data[category][product_idx]["price"] = new_price
         data[category][product_idx]["file"] = request.form.get("file")
         
-        save_data(data) # JSON dosyasına yaz
+        save_data(data)
         return redirect(url_for("admin_panel"))
 
-    # Düzenleme Formu
     return render_template_string(f"""
     <html>
     <head><meta charset="utf-8"><title>Ürün Düzenle</title><style>{get_common_styles()}</style></head>
@@ -421,7 +441,7 @@ def edit_product(category, product_id):
                     <input type="text" name="name" value="{product['name']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
                 </div>
                 <div style="margin-bottom:15px;">
-                    <label style="font-weight:bold;">Fiyat (Örn: 15.00 TL):</label>
+                    <label style="font-weight:bold;">Fiyat (Sadece sayı girin, Örn: 15.00):</label>
                     <input type="text" name="price" value="{product['price']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
                 </div>
                 <div style="margin-bottom:25px;">
