@@ -6,7 +6,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "Erkam_Miknatis_Guvenli_Anahtar_2024") 
 
 # --- Admin Ayarları ---
-ADMIN_PASSWORD = "admin123" 
+ADMIN_PASSWORD =  "turmişijorun" 
 DATA_FILE = "products.json"
 
 # --- Başlangıç Ürün Veri Bankası ---
