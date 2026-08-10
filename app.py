@@ -104,6 +104,17 @@ def get_common_styles():
     .add-btn { background:#0b1a3d; color:#fff; text-decoration:none; padding:10px; border-radius:6px; font-weight:bold; display: block; }
     .add-btn:hover { background:#ffd700; color:#0b1a3d; }
     
+    /* Chrome, Safari, Edge, Opera numara oklarını gizle (temiz + - görünümü için) */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    /* Firefox numara oklarını gizle */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
     .admin-table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
     .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
     .admin-table th { background: #0b1a3d; color: white; }
@@ -294,9 +305,11 @@ def cart_page():
         items_html += f"""
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:15px 0; gap:10px; flex-wrap:wrap;">
             <div style="flex:2; min-width:150px;"><b>{v['name']}</b><br><small>{price_val:,.2f} TL / Adet</small></div>
-            <div style="flex:1; text-align:center; display:flex; align-items:center; justify-content:center; gap:5px;">
-                <input type="number" name="qty_{v['id']}" value="{v['quantity']}" min="1" style="width:70px; padding:6px; text-align:center; border:1px solid #ccc; border-radius:5px; font-weight:bold;">
-                <a href="/remove_from_cart/{v['id']}" style="text-decoration:none; background:#ff4d4d; color:white; padding:6px 10px; border-radius:5px; font-size:12px;" title="Ürünü Sil">🗑️</a>
+            <div style="flex:1; text-align:center; display:flex; align-items:center; justify-content:center; gap:2px;">
+                <button type="button" onclick="changeQty('{v['id']}', -1)" style="background:#e0e0e0; border:none; padding:8px 12px; font-weight:bold; border-radius:4px 0 0 4px; cursor:pointer;">-</button>
+                <input type="number" id="qty_input_{v['id']}" name="qty_{v['id']}" value="{v['quantity']}" min="1" style="width:60px; padding:7px 2px; text-align:center; border:1px solid #ccc; font-weight:bold; outline:none;">
+                <button type="button" onclick="changeQty('{v['id']}', 1)" style="background:#e0e0e0; border:none; padding:8px 12px; font-weight:bold; border-radius:0 4px 4px 0; cursor:pointer;">+</button>
+                <a href="/remove_from_cart/{v['id']}" style="text-decoration:none; background:#ff4d4d; color:white; padding:7px 10px; border-radius:5px; font-size:12px; margin-left:5px;" title="Ürünü Sil">🗑️</a>
             </div>
             <div style="flex:1; text-align:right; font-weight:bold; color:#e67e22; min-width:90px;">{sub:,.2f} TL</div>
         </div>"""
@@ -317,6 +330,15 @@ def cart_page():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Sepetim - Erkam Mıknatıs</title>
         <style>{get_common_styles()}</style>
+        <script>
+            function changeQty(id, val) {{
+                let input = document.getElementById('qty_input_' + id);
+                let currentVal = parseInt(input.value) || 1;
+                let newVal = currentVal + val;
+                if (newVal < 1) newVal = 1;
+                input.value = newVal;
+            }}
+        </script>
     </head>
     <body>
         {get_header_html()}
@@ -324,7 +346,7 @@ def cart_page():
             <h1>🛒 Sepetiniz</h1>
             <form action="/update_cart" method="POST">
                 {items_html if items_html else "<p>Sepetiniz boş.</p>"}
-                {"" if not items_html else '<div style="margin-top:15px; text-align:right;"><button type="submit" style="background:#f39c12; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">🔄 Adetleri Güncelle</button></div>'}
+                {"" if not items_html else '<div style="margin-top:15px; text-align:right;"><button type="submit" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer; font-size:14px;">💾 Kaydet</button></div>'}
             </form>
             <div style="text-align:right; margin-top:20px;">
                 <h3>Toplam: {total:,.2f} TL</h3>
