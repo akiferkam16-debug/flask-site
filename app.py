@@ -9,35 +9,35 @@ app.secret_key = os.environ.get("SECRET_KEY", "Erkam_Miknatis_Guvenli_Anahtar_20
 ADMIN_PASSWORD = "admin123" 
 DATA_FILE = "products.json"
 
-# --- Başlangıç Ürün Veri Bankası (out_of_stock eklendi) ---
+# --- Başlangıç Ürün Veri Bankası ---
 DEFAULT_DATA = {
     "yuvarlak": [
-        {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": 3.00, "out_of_stock": False},
-        {"id": 2, "name": "8x3 mm Yuvarlak", "file": "2.jpg", "price": 6.00, "out_of_stock": False},
-        {"id": 3, "name": "15x3 mm Yuvarlak", "file": "3.jpg", "price": 12.00, "out_of_stock": False},
-        {"id": 4, "name": "10x5 mm Yuvarlak", "file": "10x5 12 tl.jpg", "price": 12.00, "out_of_stock": False},
-        {"id": 5, "name": "18x2 mm Yuvarlak", "file": "7.jpg", "price": 14.00, "out_of_stock": False},
-        {"id": 6, "name": "40x5 mm Yuvarlak", "file": "6.jpg", "price": 170.00, "out_of_stock": False},
-        {"id": 7, "name": "12x2 mm Yuvarlak", "file": "19.jpg", "price": 6.24, "out_of_stock": False},
-        {"id": 8, "name": "50x10 mm Yuvarlak", "file": "20.jpg", "price": 647.40, "out_of_stock": False}
+        {"id": 1, "name": "4x2 mm Yuvarlak", "file": "1.jpg", "price": 3.00},
+        {"id": 2, "name": "8x3 mm Yuvarlak", "file": "2.jpg", "price": 6.00},
+        {"id": 3, "name": "15x3 mm Yuvarlak", "file": "3.jpg", "price": 12.00},
+        {"id": 4, "name": "10x5 mm Yuvarlak", "file": "10x5 12 tl.jpg", "price": 12.00},
+        {"id": 5, "name": "18x2 mm Yuvarlak", "file": "7.jpg", "price": 14.00},
+        {"id": 6, "name": "40x5 mm Yuvarlak", "file": "6.jpg", "price": 170.00},
+        {"id": 7, "name": "12x2 mm Yuvarlak", "file": "19.jpg", "price": 6.24},
+        {"id": 8, "name": "50x10 mm Yuvarlak", "file": "20.jpg", "price": 647.40}
     ],
     "dikdortgen": [
-        {"id": 101, "name": "10x5x2 mm Dikdörtgen", "file": "4.jpg", "price": 6.00, "out_of_stock": False},
-        {"id": 102, "name": "20x10x5 mm Dikdörtgen", "file": "20x10x5.jpg", "price": 9.00, "out_of_stock": False},
-        {"id": 103, "name": "30x10x5 mm Dikdörtgen", "file": "30x10x5 77tl.jpg", "price": 11.00, "out_of_stock": False},
-        {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": 14.00, "out_of_stock": False},
-        {"id": 105, "name": "10x10x2 mm Dikdörtgen", "file": "21.jpg", "price": 20.00, "out_of_stock": False},
-        {"id": 106, "name": "50x50x25 mm Dikdörtgen", "file": "22.jpg", "price": 1638.00, "out_of_stock": False}
+        {"id": 101, "name": "10x5x2 mm Dikdörtgen", "file": "4.jpg", "price": 6.00},
+        {"id": 102, "name": "20x10x5 mm Dikdörtgen", "file": "20x10x5.jpg", "price": 9.00},
+        {"id": 103, "name": "30x10x5 mm Dikdörtgen", "file": "30x10x5 77tl.jpg", "price": 11.00},
+        {"id": 104, "name": "15x15x5 mm Dikdörtgen", "file": "15x15x5.jpg", "price": 14.00},
+        {"id": 105, "name": "10x10x2 mm Dikdörtgen", "file": "21.jpg", "price": 20.00},
+        {"id": 106, "name": "50x50x25 mm Dikdörtgen", "file": "22.jpg", "price": 1638.00}
     ],
     "halka": [
-        {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": 23.00, "out_of_stock": False},
-        {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": 25.00, "out_of_stock": False},
-        {"id": 203, "name": "15x5 mm - 10/5,5 Havşa", "file": "23.jpg", "price": 33.52, "out_of_stock": False},
-        {"id": 204, "name": "18x5 mm - 10/5,5 Havşa", "file": "24.jpg", "price": 42.00, "out_of_stock": False},
-        {"id": 205, "name": "20x5 mm - 10/5,5 Havşa", "file": "25.jpg", "price": 56.16, "out_of_stock": False},
-        {"id": 206, "name": "25x5 mm - 10/5,5 Havşa", "file": "26.jpg", "price": 72.00, "out_of_stock": False},
-        {"id": 207, "name": "30x5 mm - 10/5 Havşa", "file": "27.jpg", "price": 84.00, "out_of_stock": False},
-        {"id": 208, "name": "40x5 mm - 10/5 Havşa", "file": "28.jpg", "price": 179.40, "out_of_stock": False}
+        {"id": 201, "name": "10x5 mm - 6/3 Havşa", "file": "havşa.jpg", "price": 23.00},
+        {"id": 202, "name": "12x5 mm 8x4 - 8/4 Havşa", "file": "havşa2.jpg", "price": 25.00},
+        {"id": 203, "name": "15x5 mm - 10/5,5 Havşa", "file": "23.jpg", "price": 33.52},
+        {"id": 204, "name": "18x5 mm - 10/5,5 Havşa", "file": "24.jpg", "price": 42.00},
+        {"id": 205, "name": "20x5 mm - 10/5,5 Havşa", "file": "25.jpg", "price": 56.16},
+        {"id": 206, "name": "25x5 mm - 10/5,5 Havşa", "file": "26.jpg", "price": 72.00},
+        {"id": 207, "name": "30x5 mm - 10/5 Havşa", "file": "27.jpg", "price": 84.00},
+        {"id": 208, "name": "40x5 mm - 10/5 Havşa", "file": "28.jpg", "price": 179.40}
     ]
 }
 
@@ -46,13 +46,7 @@ def load_data():
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(DEFAULT_DATA, f, ensure_ascii=False, indent=4)
     with open(DATA_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
-        # Eski json dosyalarında out_of_stock alanı yoksa hata vermemesi için kontrol
-        for cat in data:
-            for item in data[cat]:
-                if "out_of_stock" not in item:
-                    item["out_of_stock"] = False
-        return data
+        return json.load(f)
 
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
@@ -102,7 +96,7 @@ def get_common_styles():
     .cat-link:hover { background: #0b1a3d; color: white; }
 
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
-    .product-card { background:#fff; padding:15px; border-radius:12px; text-align:center; transition: 0.3s; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+    .product-card { background:#fff; padding:15px; border-radius:12px; text-align:center; transition: 0.3s; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; }
     .product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     .product-card img { width:100%; height:180px; object-fit:contain; background: #fff; border-radius:8px; }
     .title { font-weight: bold; margin: 12px 0; height: 40px; overflow: hidden; color:#0b1a3d; font-size: 15px; }
@@ -110,15 +104,13 @@ def get_common_styles():
     .add-btn { background:#0b1a3d; color:#fff; text-decoration:none; padding:10px; border-radius:6px; font-weight:bold; display: block; }
     .add-btn:hover { background:#ffd700; color:#0b1a3d; }
     
-    .out-of-stock-badge { position: absolute; top: 15px; left: 15px; background: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; }
-    .disabled-btn { background: #ccc !important; color: #666 !important; pointer-events: none; }
-
-    /* Chrome, Safari, Edge, Opera numara oklarını gizle */
+    /* Chrome, Safari, Edge, Opera numara oklarını gizle (temiz + - görünümü için) */
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
+    /* Firefox numara oklarını gizle */
     input[type=number] {
         -moz-appearance: textfield;
     }
@@ -147,19 +139,13 @@ def render_products(prod_list):
     html = ""
     for p in prod_list:
         price_formatted = f"{float(p['price']):,.2f} TL"
-        is_oos = p.get("out_of_stock", False)
-        
-        badge_html = '<div class="out-of-stock-badge">Stokta Yok</div>' if is_oos else ''
-        btn_html = '<span class="add-btn disabled-btn">Stokta Yok</span>' if is_oos else f'<a class="add-btn" href="/add_to_cart/{p[\'id\']}">Sepete Ekle</a>'
-        
         html += f"""
         <div class="product-card">
-            {badge_html}
             <img src="/static/{p['file']}" alt="{p['name']}">
             <div>
                 <div class="title">{p['name']}</div>
                 <div class="price">{price_formatted}</div>
-                {btn_html}
+                <a class="add-btn" href="/add_to_cart/{p['id']}">Sepete Ekle</a>
             </div>
         </div>
         """
@@ -261,19 +247,15 @@ def contact():
 
 @app.route("/add_to_cart/<int:product_id>")
 def add_to_cart(product_id):
-    all_products = get_all_products_list()
-    p = next((item for item in all_products if item["id"] == product_id), None)
-    
-    # Ürün stokta yoksa sepete eklenmesini engelle
-    if not p or p.get("out_of_stock", False):
-        return redirect(url_for("index"))
-
     cart = get_cart()
     str_id = str(product_id)
     if str_id in cart:
         cart[str_id]['quantity'] += 1
     else:
-        cart[str_id] = {"id": p["id"], "name": p["name"], "price": float(p["price"]), "quantity": 1}
+        all_products = get_all_products_list()
+        p = next((item for item in all_products if item["id"] == product_id), None)
+        if p:
+            cart[str_id] = {"id": p["id"], "name": p["name"], "price": float(p["price"]), "quantity": 1}
     session["cart"] = cart
     session.modified = True
     return redirect(url_for("cart_page"))
@@ -419,21 +401,19 @@ def admin_panel():
     def generate_table(category_key, title):
         rows = ""
         for p in data[category_key]:
-            is_oos = p.get("out_of_stock", False)
-            status_text = '<span style="color:red; font-weight:bold;">Stokta Yok</span>' if is_oos else '<span style="color:green; font-weight:bold;">Stokta Var</span>'
             rows += f"""
             <tr>
                 <td>{p['id']}</td>
                 <td>{p['name']}</td>
                 <td>{float(p['price']):,.2f} TL</td>
-                <td>{status_text}</td>
+                <td>{p['file']}</td>
                 <td><a href="/admin/edit/{category_key}/{p['id']}" class="edit-btn">✏️ Düzenle</a></td>
             </tr>
             """
         return f"""
         <h3 style="margin-top:30px; color:#0b1a3d;">{title}</h3>
         <table class="admin-table">
-            <tr><th>ID</th><th>Ürün Adı</th><th>Fiyat</th><th>Durum</th><th>İşlem</th></tr>
+            <tr><th>ID</th><th>Ürün Adı</th><th>Fiyat</th><th>Görsel Dosyası</th><th>İşlem</th></tr>
             {rows}
         </table>
         """
@@ -484,13 +464,9 @@ def edit_product(category, product_id):
         data[category][product_idx]["name"] = request.form.get("name")
         data[category][product_idx]["price"] = new_price
         data[category][product_idx]["file"] = request.form.get("file")
-        # Checkbox işaretliyse True, değilse False yapılır
-        data[category][product_idx]["out_of_stock"] = True if request.form.get("out_of_stock") == "on" else False
         
         save_data(data)
         return redirect(url_for("admin_panel"))
-
-    checked_attr = "checked" if product.get("out_of_stock", False) else ""
 
     return render_template_string(f"""
     <html>
@@ -508,13 +484,9 @@ def edit_product(category, product_id):
                     <label style="font-weight:bold;">Fiyat (Sadece sayı girin, Örn: 15.00):</label>
                     <input type="text" name="price" value="{product['price']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
                 </div>
-                <div style="margin-bottom:15px;">
+                <div style="margin-bottom:25px;">
                     <label style="font-weight:bold;">Görsel Dosya Adı (Örn: 1.jpg):</label>
                     <input type="text" name="file" value="{product['file']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
-                </div>
-                <div style="margin-bottom:25px; display:flex; align-items:center; gap:10px;">
-                    <input type="checkbox" id="oos" name="out_of_stock" {checked_attr} style="width:20px; height:20px; cursor:pointer;">
-                    <label for="oos" style="font-weight:bold; color:#e74c3c; cursor:pointer;">🔴 Stokta Yok (İşaretlenirse sepete eklenemez ve sitede tükenmiş görünür)</label>
                 </div>
                 <div style="display:flex; justify-content:space-between;">
                     <a href="/admin" style="background:#ccc; color:black; padding:10px 20px; text-decoration:none; border-radius:5px;">İptal</a>
