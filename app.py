@@ -10,6 +10,8 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Erkam_Guvenli_Sifre_99!_2026"
 db_url = os.environ.get("DATABASE_URL", "sqlite:///products.db")
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
+if db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -59,7 +61,7 @@ with app.app_context():
             db.session.add(new_product)
         db.session.commit()
 
-# --- Ortak Stil ve Header Fonksiyonu (Admin Butonu Kaldırıldı) ---
+# --- Ortak Stil ve Header Fonksiyonu ---
 def get_header_html():
     return """
     <header>
@@ -137,7 +139,7 @@ def get_cart():
     cart = session.get("cart", {})
     return cart if isinstance(cart, dict) else {}
 
-# --- Müşteri (Önyüz) Route'ları ---
+# --- Müşteri Route'ları ---
 
 @app.route("/")
 def index():
@@ -301,7 +303,7 @@ def cart_page():
     </html>
     """)
 
-# --- GİZLİ YÖNETİCİ (ADMIN) ROUTE'LARI (Tamamen Maskelendi) ---
+# --- GİZLİ YÖNETİCİ ROUTE'LARI ---
 
 @app.route("/erkam-ozel-yonetim-2026", methods=["GET", "POST"])
 def admin_login():
@@ -336,7 +338,7 @@ def admin_logout():
 @app.route("/erkam-panel-yonetimi")
 def admin_panel():
     if not session.get("is_admin"):
-        return redirect(url_for("index")) # Yetkisiz biri gelirse doğrudan ana sayfaya atar, hata bile vermez!
+        return redirect(url_for("index"))
         
     def generate_table(category_key, title):
         products = Product.query.filter_by(category=category_key).all()
