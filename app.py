@@ -1,11 +1,24 @@
 import os
-from flask import Flask, render_template_string, request, redirect, url_for, session
+import time
+from flask import Flask, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "gizli-anahtar-buraya"
 
-# --- Veritabanı Ayarları (Klasik ve Kesin Çözüm) ---
+# --- Dosya Yükleme Ayarları ---
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Klasör yoksa otomatik oluştur
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# --- Veritabanı Ayarları ---
 db_url = os.environ.get("DATABASE_URL", "sqlite:///products.db")
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -88,7 +101,7 @@ def index():
                 <div class="product-card">
                     {img_tag}
                     <h3>{p.name}</h3>
-                    <p style="color:green; font-weight:bold;">{p.price} TL</p>
+                    <p style="color:green; font-weight:bold;">{p.price:.2f} TL</p>
                     <a href="/product/{p.id}" class="btn">İncele</a>
                 </div>
         """
@@ -103,6 +116,9 @@ def index():
 @app.route("/product/<int:product_id>")
 def product_detail(product_id):
     p = Product.query.get_or_404(product_id)
+    min_qty = 100 if p.price < 50.0 else 1
+    uyari_html = f"<p style='color:red; font-weight:bold;'>Bu üründe numunelik satış yoktur, minimum {min_qty} adet sipariş verebilirsiniz.</p>" if min_qty > 1 else ""
+    
     return f"""
     <!DOCTYPE html>
     <html lang="tr">
@@ -111,9 +127,12 @@ def product_detail(product_id):
         {get_header_html()}
         <div style="width:60%; margin:30px auto; background:#fff; padding:20px; border-radius:8px;">
             <h2>{p.name}</h2>
-            <p style="color:green; font-size:20px; font-weight:bold;">{p.price} TL</p>
+            <p style="color:green; font-size:20px; font-weight:bold;">{p.price:.2f} TL</p>
+            {uyari_html}
             <p>{p.description or 'Açıklama bulunmuyor.'}</p>
-            <form action="/add-to-cart/{p.id}" method="POST">
+            <form action="/add-to-cart/{p.id}" method="POST" style="display:flex; gap:10px; align-items:center; margin-top:15px;">
+                <label>Adet:</label>
+                <input type="number" name="quantity" value="{min_qty}" min="{min_qty}" style="padding:8px; width:80px;">
                 <button type="submit" style="background:green; color:#fff; padding:10px 20px; border:none; border-radius:4px; cursor:pointer;">Sepete Ekle</button>
             </form>
             <br><a href="/">← Ana Sayfaya Dön</a>
@@ -124,8 +143,24 @@ def product_detail(product_id):
 
 @app.route("/add-to-cart/<int:product_id>", methods=["POST"])
 def add_to_cart(product_id):
+    p = Product.query.get_or_404(product_id)
     cart = get_cart()
-    cart[str(product_id)] = cart.get(str(product_id), 0) + 1
+    
+    try:
+        qty = int(request.form.get("quantity", 1))
+    except ValueError:
+        qty = 1
+
+    # Minimum 100 adet kontrolü (50 TL altı ürünler için)
+    if p.price < 50.0 and qty < 100:
+        return f"""
+        <script>
+            alert('Bu üründe minimum 100 adet sipariş verebilirsiniz!');
+            window.history.back();
+        </script>
+        """, 400
+
+    cart[str(product_id)] = cart.get(str(product_id), 0) + qty
     session["cart"] = cart
     return redirect(url_for("cart_page"))
 
@@ -139,7 +174,7 @@ def cart_page():
         if p:
             subtotal = p.price * qty
             total += subtotal
-            items_html += f"<li>{p.name} - {qty} Adet x {p.price} TL = <b>{subtotal} TL</b></li>"
+            items_html += f"<li>{p.name} - {qty} Adet x {p.price:.2f} TL = <b>{subtotal:.2f} TL</b></li>"
 
     return f"""
     <!DOCTYPE html>
@@ -150,19 +185,19 @@ def cart_page():
         <div style="width:60%; margin:30px auto; background:#fff; padding:20px; border-radius:8px;">
             <h2>Alışveriş Sepetiniz</h2>
             <ul>{items_html if items_html else "Sepetiniz boş."}</ul>
-            <h3>Toplam Tutar: {total} TL</h3>
+            <h3>Toplam Tutar: {total:.2f} TL</h3>
             <a href="/" style="background:#007bff; color:#fff; padding:8px 15px; text-decoration:none; border-radius:4px; display:inline-block;">Alışverişe Devam Et</a>
         </div>
     </body>
     </html>
     """
 
-# --- GİZLİ YÖNETİCİ (ADMIN) ROUTE'LARI ---
+# --- YÖNETİCİ (ADMIN) ROUTE'LARI ---
 @app.route("/erkam-ozel-yonetim-2026", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
         password = request.form.get("password")
-        if password == "erkam2026*": # Yönetici şifren (İstediğin gibi değiştirebilirsin)
+        if password == "erkam2026*": 
             session["is_admin"] = True
             return redirect(url_for("admin_panel"))
         return "Hatalı Şifre!", 403
@@ -181,12 +216,23 @@ def admin_panel():
 
     if request.method == "POST":
         name = request.form.get("name")
-        price = float(request.form.get("price", 0))
+        try:
+            price = float(request.form.get("price", 0))
+        except ValueError:
+            price = 0.0
         category = request.form.get("category")
-        image = request.form.get("image")
         description = request.form.get("description")
         
-        new_p = Product(name=name, price=price, category=category, image=image, description=description)
+        image_url = None
+        # Bilgisayardan dosya yükleme kontrolü
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename != '' and allowed_file(file.filename):
+                filename = f"{int(time.time())}_{secure_filename(file.filename)}"
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                image_url = f"/static/uploads/{filename}"
+
+        new_p = Product(name=name, price=price, category=category, image=image_url, description=description)
         db.session.add(new_p)
         db.session.commit()
         return redirect(url_for("admin_panel"))
@@ -194,7 +240,7 @@ def admin_panel():
     products = Product.query.all()
     rows = ""
     for p in products:
-        rows += f"<tr><td>{p.id}</td><td>{p.name}</td><td>{p.price} TL</td><td>{p.category}</td><td><a href='/admin/delete/{p.id}' style='color:red;'>Sil</a></td></tr>"
+        rows += f"<tr><td>{p.id}</td><td>{p.name}</td><td>{p.price:.2f} TL</td><td>{p.category}</td><td><a href='/admin/delete/{p.id}' style='color:red;'>Sil</a></td></tr>"
 
     return f"""
     <!DOCTYPE html>
@@ -205,11 +251,12 @@ def admin_panel():
         <a href="/admin-logout" style="color:red; font-weight:bold;">Çıkış Yap</a> | <a href="/">Ana Sayfa</a>
         <hr>
         <h3>Yeni Ürün Ekle</h3>
-        <form method="POST" style="background:#fff; padding:15px; border-radius:5px; width:400px; display:flex; flex-direction:column; gap:10px;">
+        <form method="POST" enctype="multipart/form-data" style="background:#fff; padding:15px; border-radius:5px; width:400px; display:flex; flex-direction:column; gap:10px;">
             <input type="text" name="name" placeholder="Ürün Adı" required style="padding:8px;">
             <input type="number" step="0.01" name="price" placeholder="Fiyat (TL)" required style="padding:8px;">
             <input type="text" name="category" placeholder="Kategori (örn: neodimyum)" required style="padding:8px;">
-            <input type="text" name="image" placeholder="Resim URL'si" style="padding:8px;">
+            <label style="font-size:14px; color:#555;">Ürün Fotoğrafı Seç:</label>
+            <input type="file" name="image" accept="image/*" style="padding:8px;">
             <textarea name="description" placeholder="Ürün Açıklaması" style="padding:8px;"></textarea>
             <button type="submit" style="background:green; color:#fff; padding:10px; border:none; cursor:pointer;">Ürünü Ekle</button>
         </form>
@@ -239,4 +286,3 @@ def admin_logout():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-    
