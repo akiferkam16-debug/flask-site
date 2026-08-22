@@ -1,3 +1,8 @@
+Kitaplık
+/
+app_admin_gizli.py
+
+
 from flask import Flask, session, redirect, request, render_template_string, url_for
 import os
 import json
