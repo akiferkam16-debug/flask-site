@@ -6,7 +6,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "Erkam_Miknatis_Guvenli_Anahtar_2024") 
 
 # --- Admin Ayarları ---
-ADMIN_PASSWORD =  "kaplantest" 
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD") 
 DATA_FILE = "products.json"
 
 # --- Başlangıç Ürün Veri Bankası ---
@@ -66,7 +66,6 @@ def get_header_html():
             <div class="nav-right">
                 <a class="nav-btn contact-btn" href="/iletisim">📞 İletişim</a>
                 <a class="nav-btn cart-btn" href="/cart">🛒 Sepet</a>
-                <a class="nav-btn admin-btn" href="/admin" style="background:#8e44ad;">⚙️ Admin</a>
                 <form action="/search" method="GET" class="search-form">
                     <input type="text" name="q" placeholder="Ürün ara..." required>
                     <button type="submit">🔍</button>
@@ -360,7 +359,7 @@ def cart_page():
     </html>
     """)
 
-@app.route("/admin/login", methods=["GET", "POST"])
+@app.route("/erkam-yonetim/login", methods=["GET", "POST"])
 def admin_login():
     error = ""
     if request.method == "POST":
@@ -386,12 +385,12 @@ def admin_login():
     </body></html>
     """)
 
-@app.route("/admin/logout")
+@app.route("/erkam-yonetim/logout")
 def admin_logout():
     session.pop("is_admin", None)
     return redirect(url_for("index"))
 
-@app.route("/admin")
+@app.route("/erkam-yonetim")
 def admin_panel():
     if not session.get("is_admin"):
         return redirect(url_for("admin_login"))
@@ -407,7 +406,7 @@ def admin_panel():
                 <td>{p['name']}</td>
                 <td>{float(p['price']):,.2f} TL</td>
                 <td>{p['file']}</td>
-                <td><a href="/admin/edit/{category_key}/{p['id']}" class="edit-btn">✏️ Düzenle</a></td>
+                <td><a href="/erkam-yonetim/edit/{category_key}/{p['id']}" class="edit-btn">✏️ Düzenle</a></td>
             </tr>
             """
         return f"""
@@ -426,7 +425,7 @@ def admin_panel():
         <div style="max-width:1200px; margin:20px auto; padding:20px; background:white; border-radius:10px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2>⚙️ Ürün Yönetim Paneli</h2>
-                <a href="/admin/logout" style="color:red; text-decoration:none; font-weight:bold;">🚪 Çıkış Yap</a>
+                <a href="/erkam-yonetim/logout" style="color:red; text-decoration:none; font-weight:bold;">🚪 Çıkış Yap</a>
             </div>
             <p>Buradan ürün bilgilerini değiştirebilirsiniz. Değişiklikler anında sitede güncellenir.</p>
             
@@ -440,7 +439,7 @@ def admin_panel():
     """
     return render_template_string(html)
 
-@app.route("/admin/edit/<category>/<int:product_id>", methods=["GET", "POST"])
+@app.route("/erkam-yonetim/edit/<category>/<int:product_id>", methods=["GET", "POST"])
 def edit_product(category, product_id):
     if not session.get("is_admin"):
         return redirect(url_for("admin_login"))
@@ -489,7 +488,7 @@ def edit_product(category, product_id):
                     <input type="text" name="file" value="{product['file']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
                 </div>
                 <div style="display:flex; justify-content:space-between;">
-                    <a href="/admin" style="background:#ccc; color:black; padding:10px 20px; text-decoration:none; border-radius:5px;">İptal</a>
+                    <a href="/erkam-yonetim" style="background:#ccc; color:black; padding:10px 20px; text-decoration:none; border-radius:5px;">İptal</a>
                     <button type="submit" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">💾 Kaydet</button>
                 </div>
             </form>
