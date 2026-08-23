@@ -1,6 +1,8 @@
 from flask import Flask, session, redirect, request, render_template_string, url_for
+from werkzeug.utils import secure_filename
 import os
 import json
+import uuid
 
 app = Flask(__name__) 
 app.secret_key = os.environ.get("SECRET_KEY", "Erkam_Miknatis_Guvenli_Anahtar_2024") 
@@ -8,6 +10,9 @@ app.secret_key = os.environ.get("SECRET_KEY", "Erkam_Miknatis_Guvenli_Anahtar_20
 # --- Admin Ayarları ---
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD") 
 DATA_FILE = "products.json"
+UPLOAD_FOLDER = os.path.join("static", "uploads")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
 
 # --- Başlangıç Ürün Veri Bankası ---
 DEFAULT_DATA = {
@@ -119,6 +124,20 @@ def get_common_styles():
     .admin-table th { background: #0b1a3d; color: white; }
     .admin-table tr:hover { background: #f1f1f1; }
     .edit-btn { background: #f39c12; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 12px; }
+    .add-product-btn { background:#27ae60; color:white; padding:8px 14px; border-radius:7px; text-decoration:none; font-weight:bold; font-size:13px; display:inline-block; }
+    .add-product-btn:hover { background:#219150; }
+    .admin-section-title { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-top:30px; }
+    .drop-zone { border:2px dashed #9aa7bd; border-radius:12px; padding:24px 15px; text-align:center; background:#f8f9fc; cursor:pointer; transition:0.2s; }
+    .drop-zone:hover, .drop-zone.dragover { border-color:#0b1a3d; background:#eef2f8; }
+    .drop-zone input[type=file] { display:none; }
+    .drop-zone-icon { font-size:34px; margin-bottom:6px; }
+    .drop-zone strong { display:block; color:#0b1a3d; }
+    .drop-zone small { color:#666; }
+    .image-preview { margin-top:12px; text-align:center; }
+    .image-preview img { max-width:220px; max-height:180px; object-fit:contain; border-radius:8px; border:1px solid #ddd; background:white; padding:5px; }
+    .current-image { margin:10px 0 15px; text-align:center; }
+    .current-image img { max-width:180px; max-height:140px; object-fit:contain; border-radius:8px; border:1px solid #ddd; padding:5px; }
+    .file-name { display:block; margin-top:8px; color:#27ae60; font-weight:bold; font-size:13px; }
     
     @media (max-width:768px) {
         .header-container { flex-direction: column; gap: 12px; padding: 10px; }
@@ -410,7 +429,10 @@ def admin_panel():
             </tr>
             """
         return f"""
-        <h3 style="margin-top:30px; color:#0b1a3d;">{title}</h3>
+        <div class="admin-section-title">
+            <h3 style="margin:0; color:#0b1a3d;">{title}</h3>
+            <a href="/erkam-yonetim/add/{category_key}" class="add-product-btn">➕ Bu Kategoriye Ürün Ekle</a>
+        </div>
         <table class="admin-table">
             <tr><th>ID</th><th>Ürün Adı</th><th>Fiyat</th><th>Görsel Dosyası</th><th>İşlem</th></tr>
             {rows}
@@ -439,60 +461,292 @@ def admin_panel():
     """
     return render_template_string(html)
 
+
+@app.route("/erkam-yonetim/add/<category>", methods=["GET", "POST"])
+def add_product(category):
+    if not session.get("is_admin"):
+        return redirect(url_for("admin_login"))
+
+    data = load_data()
+    category_titles = {
+        "yuvarlak": "Yuvarlak Mıknatıslar",
+        "dikdortgen": "Dikdörtgen Mıknatıslar",
+        "halka": "Halka (Havşalı) Mıknatıslar"
+    }
+
+    if category not in data or category not in category_titles:
+        return "Geçersiz kategori.", 404
+
+    error = ""
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        price_text = request.form.get("price", "").strip().replace(",", ".")
+        image = request.files.get("image")
+
+        if not name:
+            error = "Ürün adı boş bırakılamaz."
+        else:
+            try:
+                price = float(price_text)
+                if price < 0:
+                    raise ValueError
+            except ValueError:
+                error = "Fiyat geçerli bir sayı olmalı."
+
+        filename = None
+        if not error:
+            if not image or not image.filename:
+                error = "Lütfen bir ürün fotoğrafı seçin veya sürükleyip bırakın."
+            else:
+                original = secure_filename(image.filename)
+                ext = original.rsplit(".", 1)[-1].lower() if "." in original else ""
+                if ext not in ALLOWED_IMAGE_EXTENSIONS:
+                    error = "Desteklenen fotoğraf türleri: JPG, JPEG, PNG, WEBP, GIF."
+                else:
+                    filename = f"{uuid.uuid4().hex}.{ext}"
+                    image.save(os.path.join(UPLOAD_FOLDER, filename))
+
+        if not error:
+            ids = [int(p["id"]) for products in data.values() for p in products if str(p.get("id", "")).isdigit()]
+            new_id = max(ids, default=0) + 1
+            data[category].append({
+                "id": new_id,
+                "name": name,
+                "file": f"uploads/{filename}",
+                "price": price
+            })
+            save_data(data)
+            return redirect(url_for("admin_panel"))
+
+    return render_template_string(f"""
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ürün Ekle - Erkam Mıknatıs</title>
+        <style>{get_common_styles()}</style>
+    </head>
+    <body>
+        {get_header_html()}
+        <div style="max-width:550px; margin:35px auto; background:white; padding:30px; border-radius:12px; box-shadow:0 5px 18px rgba(0,0,0,0.08);">
+            <h2 style="color:#0b1a3d; margin-top:0;">➕ {category_titles[category]} — Yeni Ürün</h2>
+            {f'<div style="background:#f8d7da;color:#721c24;padding:10px;border-radius:7px;margin-bottom:15px;font-weight:bold;">⚠️ {error}</div>' if error else ''}
+            <form method="POST" enctype="multipart/form-data">
+                <div style="margin-bottom:15px;">
+                    <label style="font-weight:bold;">Ürün Adı:</label>
+                    <input type="text" name="name" value="{{{{ request.form.get('name','') }}}}" placeholder="Örn: 20x5 mm Yuvarlak" style="width:100%; box-sizing:border-box; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
+                </div>
+                <div style="margin-bottom:18px;">
+                    <label style="font-weight:bold;">Fiyat (TL):</label>
+                    <input type="text" name="price" value="{{{{ request.form.get('price','') }}}}" placeholder="Örn: 25.00" style="width:100%; box-sizing:border-box; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
+                </div>
+
+                <div style="margin-bottom:22px;">
+                    <label style="font-weight:bold;">Ürün Fotoğrafı:</label>
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-zone-icon">⬆️</div>
+                        <strong>Fotoğrafı buraya sürükleyip bırak</strong>
+                        <small>veya buraya tıklayıp bilgisayardan seç</small>
+                        <input type="file" id="imageInput" name="image" accept="image/png,image/jpeg,image/webp,image/gif" required>
+                        <span class="file-name" id="fileName"></span>
+                        <div class="image-preview" id="preview"></div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; gap:10px;">
+                    <a href="/erkam-yonetim" style="background:#ccc; color:black; padding:10px 20px; text-decoration:none; border-radius:5px;">İptal</a>
+                    <button type="submit" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">💾 Ürünü Ekle</button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+        const dropZone = document.getElementById('dropZone');
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const fileName = document.getElementById('fileName');
+
+        dropZone.addEventListener('click', (e) => {{
+            if (e.target !== imageInput) imageInput.click();
+        }});
+        ['dragenter','dragover'].forEach(eventName => {{
+            dropZone.addEventListener(eventName, (e) => {{
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }});
+        }});
+        ['dragleave','drop'].forEach(eventName => {{
+            dropZone.addEventListener(eventName, (e) => {{
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }});
+        }});
+        dropZone.addEventListener('drop', (e) => {{
+            if (e.dataTransfer.files.length) {{
+                imageInput.files = e.dataTransfer.files;
+                showPreview(e.dataTransfer.files[0]);
+            }}
+        }});
+        imageInput.addEventListener('change', () => {{
+            if (imageInput.files.length) showPreview(imageInput.files[0]);
+        }});
+        function showPreview(file) {{
+            fileName.textContent = 'Seçilen dosya: ' + file.name;
+            if (file.type.startsWith('image/')) {{
+                const reader = new FileReader();
+                reader.onload = e => {{
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="Önizleme">';
+                }};
+                reader.readAsDataURL(file);
+            }}
+        }}
+        </script>
+    </body>
+    </html>
+    """)
+
 @app.route("/erkam-yonetim/edit/<category>/<int:product_id>", methods=["GET", "POST"])
 def edit_product(category, product_id):
     if not session.get("is_admin"):
         return redirect(url_for("admin_login"))
-        
+
     data = load_data()
     if category not in data:
-        return "Geçersiz kategori."
-        
+        return "Geçersiz kategori.", 404
+
     product_idx = next((index for (index, d) in enumerate(data[category]) if d["id"] == product_id), None)
     if product_idx is None:
-        return "Ürün bulunamadı."
-        
+        return "Ürün bulunamadı.", 404
+
     product = data[category][product_idx]
-    
+    error = ""
+
     if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        price_text = request.form.get("price", "").strip().replace(",", ".")
+        image = request.files.get("image")
+
+        if not name:
+            error = "Ürün adı boş bırakılamaz."
+
         try:
-            new_price = float(request.form.get("price").replace(",", "."))
-        except:
+            new_price = float(price_text)
+            if new_price < 0:
+                raise ValueError
+        except ValueError:
             new_price = product["price"]
+            if not error:
+                error = "Fiyat geçerli bir sayı olmalı."
 
-        data[category][product_idx]["name"] = request.form.get("name")
-        data[category][product_idx]["price"] = new_price
-        data[category][product_idx]["file"] = request.form.get("file")
-        
-        save_data(data)
-        return redirect(url_for("admin_panel"))
+        new_file = product["file"]
+        if not error and image and image.filename:
+            original = secure_filename(image.filename)
+            ext = original.rsplit(".", 1)[-1].lower() if "." in original else ""
+            if ext not in ALLOWED_IMAGE_EXTENSIONS:
+                error = "Desteklenen fotoğraf türleri: JPG, JPEG, PNG, WEBP, GIF."
+            else:
+                filename = f"{uuid.uuid4().hex}.{ext}"
+                image.save(os.path.join(UPLOAD_FOLDER, filename))
+                new_file = f"uploads/{filename}"
 
+        if not error:
+            data[category][product_idx]["name"] = name
+            data[category][product_idx]["price"] = new_price
+            data[category][product_idx]["file"] = new_file
+            save_data(data)
+            return redirect(url_for("admin_panel"))
+
+    current_image = f"/static/{product['file']}"
     return render_template_string(f"""
     <html>
-    <head><meta charset="utf-8"><title>Ürün Düzenle</title><style>{get_common_styles()}</style></head>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ürün Düzenle - Erkam Mıknatıs</title>
+        <style>{get_common_styles()}</style>
+    </head>
     <body>
         {get_header_html()}
-        <div style="max-width:500px; margin:50px auto; background:white; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);">
-            <h2 style="color:#0b1a3d;">✏️ Ürün Düzenle</h2>
-            <form method="POST">
+        <div style="max-width:550px; margin:35px auto; background:white; padding:30px; border-radius:12px; box-shadow:0 5px 18px rgba(0,0,0,0.08);">
+            <h2 style="color:#0b1a3d; margin-top:0;">✏️ Ürün Düzenle</h2>
+            {f'<div style="background:#f8d7da;color:#721c24;padding:10px;border-radius:7px;margin-bottom:15px;font-weight:bold;">⚠️ {error}</div>' if error else ''}
+
+            <form method="POST" enctype="multipart/form-data">
                 <div style="margin-bottom:15px;">
                     <label style="font-weight:bold;">Ürün Adı:</label>
-                    <input type="text" name="name" value="{product['name']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
+                    <input type="text" name="name" value="{product['name']}" style="width:100%; box-sizing:border-box; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
                 </div>
-                <div style="margin-bottom:15px;">
-                    <label style="font-weight:bold;">Fiyat (Sadece sayı girin, Örn: 15.00):</label>
-                    <input type="text" name="price" value="{product['price']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
+
+                <div style="margin-bottom:18px;">
+                    <label style="font-weight:bold;">Fiyat (TL):</label>
+                    <input type="text" name="price" value="{product['price']}" style="width:100%; box-sizing:border-box; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
                 </div>
-                <div style="margin-bottom:25px;">
-                    <label style="font-weight:bold;">Görsel Dosya Adı (Örn: 1.jpg):</label>
-                    <input type="text" name="file" value="{product['file']}" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px;" required>
+
+                <div style="margin-bottom:22px;">
+                    <label style="font-weight:bold;">Ürün Fotoğrafı:</label>
+                    <div class="current-image">
+                        <small style="display:block; margin-bottom:6px; color:#666;">Mevcut fotoğraf</small>
+                        <img src="{current_image}" alt="{product['name']}">
+                    </div>
+
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-zone-icon">🔄</div>
+                        <strong>Yeni fotoğrafı buraya sürükleyip bırak</strong>
+                        <small>veya tıklayıp yeni fotoğraf seç</small>
+                        <input type="file" id="imageInput" name="image" accept="image/png,image/jpeg,image/webp,image/gif">
+                        <span class="file-name" id="fileName"></span>
+                        <div class="image-preview" id="preview"></div>
+                    </div>
                 </div>
-                <div style="display:flex; justify-content:space-between;">
+
+                <div style="display:flex; justify-content:space-between; gap:10px;">
                     <a href="/erkam-yonetim" style="background:#ccc; color:black; padding:10px 20px; text-decoration:none; border-radius:5px;">İptal</a>
-                    <button type="submit" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">💾 Kaydet</button>
+                    <button type="submit" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">💾 Kaydet</button>
                 </div>
             </form>
         </div>
+
+        <script>
+        const dropZone = document.getElementById('dropZone');
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const fileName = document.getElementById('fileName');
+
+        dropZone.addEventListener('click', (e) => {{
+            if (e.target !== imageInput) imageInput.click();
+        }});
+        ['dragenter','dragover'].forEach(eventName => {{
+            dropZone.addEventListener(eventName, (e) => {{
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }});
+        }});
+        ['dragleave','drop'].forEach(eventName => {{
+            dropZone.addEventListener(eventName, (e) => {{
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }});
+        }});
+        dropZone.addEventListener('drop', (e) => {{
+            if (e.dataTransfer.files.length) {{
+                imageInput.files = e.dataTransfer.files;
+                showPreview(e.dataTransfer.files[0]);
+            }}
+        }});
+        imageInput.addEventListener('change', () => {{
+            if (imageInput.files.length) showPreview(imageInput.files[0]);
+        }});
+        function showPreview(file) {{
+            fileName.textContent = 'Yeni dosya: ' + file.name;
+            if (file.type.startsWith('image/')) {{
+                const reader = new FileReader();
+                reader.onload = e => {{
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="Yeni fotoğraf önizleme">';
+                }};
+                reader.readAsDataURL(file);
+            }}
+        }}
+        </script>
     </body>
     </html>
     """)
